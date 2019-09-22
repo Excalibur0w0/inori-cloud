@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: consumer-auth
+server:
+  port: 3333
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:1001/eureka
