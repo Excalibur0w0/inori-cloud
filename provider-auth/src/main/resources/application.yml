@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: provider-auth
+  datasource:
+      url: jdbc:mysql://localhost:3306/inori_cloud_auth?serverTimezone=UTC
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      username:
+      password:
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:1001/eureka
+server:
+  port: 2010

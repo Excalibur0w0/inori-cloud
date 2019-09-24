@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: provider-auth
+  datasource:
+    url: jdbc:mysql://localhost:3306/inori_cloud_auth
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username:
+    password:
