@@ -1,16 +1,16 @@
-package com.inori.cloud.providerauth.config;
+package com.inori.cloud.oauth2.config;
 
-import com.sun.deploy.net.HttpResponse;
+import com.inori.cloud.oauth2.util.InoriUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,12 +19,13 @@ import javax.servlet.http.HttpServletResponse;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    private UserDetailsService userDetailsService;
+    private InoriUserDetailsService userDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().exceptionHandling()
-                .authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+        http.csrf().disable()
+                .exceptionHandling()
+                .authenticationEntryPoint(((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
                 .and()
                 .authorizeRequests()
                 .antMatchers("/**").authenticated()
@@ -33,8 +34,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+    }
+
+    @Override
     @Bean
-    public AuthenticationManager authenticationManager() throws Exception {
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 }

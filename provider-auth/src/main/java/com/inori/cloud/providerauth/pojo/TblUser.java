@@ -7,6 +7,8 @@ public class TblUser {
 
     private Integer age;
 
+    private String upass;
+
     public String getUuid() {
         return uuid;
     }
@@ -29,5 +31,13 @@ public class TblUser {
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    public String getUpass() {
+        return upass;
+    }
+
+    public void setUpass(String upass) {
+        this.upass = upass == null ? null : upass.trim();
     }
 }

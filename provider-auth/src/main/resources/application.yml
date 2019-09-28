@@ -12,3 +12,6 @@ eureka:
       defaultZone: http://localhost:1001/eureka
 server:
   port: 2010
+feign:
+  hystrix:
+    enabled: true
