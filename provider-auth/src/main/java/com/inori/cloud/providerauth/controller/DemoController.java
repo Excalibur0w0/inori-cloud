@@ -16,7 +16,7 @@ public class DemoController {
     }
 
     @RequestMapping("/hello")
-    @PreAuthorize("hasAnyAuthority('ROLE_test','ROLE_admin')")
+    @PreAuthorize("hasAnyAuthority('ROLE_TEST','ROLE_ADMIN')")
     public String hello() {
         return "hello, nihao";
     }

@@ -6,7 +6,7 @@ import com.inori.cloud.providerauth.pojo.TblUser;
 
 import java.util.List;
 
-public interface AuthService {
+public interface UserService {
     boolean addUser(TblUser user);
     boolean deleteUser(String userId);
     boolean updateUser(String userId, TblUser newUser);

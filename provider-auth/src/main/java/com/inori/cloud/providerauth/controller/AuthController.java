@@ -3,9 +3,7 @@ package com.inori.cloud.providerauth.controller;
 import com.inori.cloud.providerauth.dto.UserLoginDTO;
 import com.inori.cloud.providerauth.pojo.TblRole;
 import com.inori.cloud.providerauth.pojo.TblUser;
-import com.inori.cloud.providerauth.service.AuthService;
-import com.inori.cloud.providerauth.service.imp.InoriUserDetailsService;
-import com.netflix.discovery.converters.Auto;
+import com.inori.cloud.providerauth.service.imp.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +13,7 @@ import java.util.List;
 @RequestMapping("auth")
 public class AuthController {
     @Autowired
-    private InoriUserDetailsService userDetailsService;
+    private AuthService userDetailsService;
 
     @GetMapping("auth")
     @ResponseBody

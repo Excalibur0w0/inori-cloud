@@ -2,10 +2,9 @@ package com.inori.cloud.providerauth.service.imp;
 
 import com.inori.cloud.providerauth.dao.mapper.*;
 import com.inori.cloud.providerauth.pojo.*;
-import com.inori.cloud.providerauth.service.AuthService;
+import com.inori.cloud.providerauth.service.UserService;
 import com.inori.cloud.providerauth.util.BPwdEncoderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class AuthServiceImp implements AuthService {
+public class UserServiceImp implements UserService {
     @Autowired
     private TblUserMapper tblUserMapper;
     @Autowired
@@ -25,7 +24,7 @@ public class AuthServiceImp implements AuthService {
     @Autowired
     private TblPermissionRoleMapper tblPermissionRoleMapper;
     @Autowired
-    private InoriUserDetailsService client;
+    private AuthService client;
 
     @Override
     public boolean addUser(TblUser user) {
