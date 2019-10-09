@@ -9,6 +9,7 @@ import com.inori.cloud.providerauth.service.UserService;
 import com.inori.cloud.providerauth.util.BPwdEncoderUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class AuthService {
     @Autowired
     private UserService authService;
+    @Qualifier("authServiceHystrix")
     @Autowired
     private AuthServiceClient client;
 
