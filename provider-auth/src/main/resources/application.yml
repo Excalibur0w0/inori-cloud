@@ -2,10 +2,10 @@ spring:
   application:
     name: provider-auth
   datasource:
-      url: jdbc:mysql://localhost:3306/inori_cloud_auth?serverTimezone=UTC
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      username:
-      password:
+      url: jdbc:mysql://127.0.0.1:3306/inori_cloud_auth?serverTimezone=UTC
+      username: passer
+      password: '123456'
+      driverClassName: com.mysql.cj.jdbc.Driver
 eureka:
   client:
     service-url:

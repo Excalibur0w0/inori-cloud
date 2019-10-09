@@ -24,7 +24,7 @@ import java.util.List;
 
 @Log4j2
 @Service
-public class InoriUserDetailsService {
+public class InoriUserDetailsService implements UserDetailsService {
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -32,21 +32,21 @@ public class InoriUserDetailsService {
     @Autowired
     private RoleUserDao roleUserDao;
 
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        log.info("running: " + username);
-//        TblUser user = userDao.findByUname(username);
-//        TblRoleUser crit = new TblRoleUser();
-//        crit.setUserId(user.getUuid());
-//        Example<TblRoleUser> example = Example.of(crit);
-//        List<InoriGrantedAuthority> authorities = new LinkedList<>();
-//
-//        roleUserDao.findAll(example).forEach(ru -> {
-//            roleDao.findById(ru.getRoleId()).ifPresent(role -> authorities.add(new InoriGrantedAuthority(role)));
-//        });
-//
-//        return new InroiUserDetails(authorities, user);
-//    }
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.info("running: " + username);
+        TblUser user = userDao.findByUname(username);
+        TblRoleUser crit = new TblRoleUser();
+        crit.setUserId(user.getUuid());
+        Example<TblRoleUser> example = Example.of(crit);
+        List<InoriGrantedAuthority> authorities = new LinkedList<>();
+
+        roleUserDao.findAll(example).forEach(ru -> {
+            roleDao.findById(ru.getRoleId()).ifPresent(role -> authorities.add(new InoriGrantedAuthority(role)));
+        });
+
+        return new InroiUserDetails(authorities, user);
+    }
 
     @Data
     @NoArgsConstructor

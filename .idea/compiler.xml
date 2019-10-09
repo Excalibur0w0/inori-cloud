@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="demo" />
+        <module name="oauth2" />
+        <module name="provider-auth" />
+        <module name="server-center" />
+        <module name="consumer-auth" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="consumer-auth" target="1.8" />
+      <module name="demo" target="1.8" />
+      <module name="oauth2" target="1.8" />
+      <module name="provider-auth" target="1.8" />
+      <module name="server-center" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="consumer-auth" options="-parameters" />
+      <module name="demo" options="-parameters" />
+      <module name="oauth2" options="-parameters" />
+      <module name="provider-auth" options="-parameters" />
+      <module name="server-center" options="-parameters" />
+    </option>
+  </component>
+</project>
