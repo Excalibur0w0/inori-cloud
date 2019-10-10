@@ -12,10 +12,9 @@ public interface UserService {
     boolean updateUser(String userId, TblUser newUser);
     TblUser getUserById(String uuid);
     TblUser getUserByUsername(String username);
-    List<TblUser> getAllUsers();
-    List<TblUser> getUsersLimit(int page, int perPage);
-    boolean checkUserLogin(TblUser user);
-//    TblUser login(String username, String pwd);
     List<TblRole> getRolesByUser(TblUser user);
-    List<TblPermission> getPermissionByRole(TblRole role);
+    boolean addRelationBetweenRoleAndUser(String roleId, String userId);
+    boolean deleteRelationBetweenRoleAndUser(String roleId, String userId);
+    boolean hasRelationBetweenRoleAndUser(String roleId, String userId);
+    List<TblUser> getAllUsers();
 }

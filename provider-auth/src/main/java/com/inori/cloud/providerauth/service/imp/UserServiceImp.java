@@ -23,14 +23,11 @@ public class UserServiceImp implements UserService {
     private TblPermissionMapper tblPermissionMapper;
     @Autowired
     private TblPermissionRoleMapper tblPermissionRoleMapper;
-    @Autowired
-    private AuthService client;
 
     @Override
     public boolean addUser(TblUser user) {
         String newPass = BPwdEncoderUtil.BCryptPassword(user.getUpass().trim());
         user.setUpass(newPass);
-        user.setUuid(UUID.randomUUID().toString());
         return tblUserMapper.insert(user) > 0;
     }
 
@@ -70,16 +67,6 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public List<TblUser> getUsersLimit(int page, int perPage) {
-        return null;
-    }
-
-    @Override
-    public boolean checkUserLogin(TblUser user) {
-        return false;
-    }
-
-    @Override
     public List<TblRole> getRolesByUser(TblUser user) {
         TblRoleUserExample example = new TblRoleUserExample();
         example.createCriteria().andUserIdEqualTo(user.getUuid());
@@ -98,21 +85,39 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public List<TblPermission> getPermissionByRole(TblRole role) {
-        TblPermissionRoleExample example = new TblPermissionRoleExample();
-        example.createCriteria().andRoleIdEqualTo(role.getUuid());
-        List<TblPermissionRole> permissionRoles = tblPermissionRoleMapper.selectByExample(example);
-        List<TblPermission> result = new LinkedList<>();
+    public boolean addRelationBetweenRoleAndUser(String roleId, String userId) {
+        TblRoleUser roleUser = new TblRoleUser();
+        roleUser.setUserId(userId);
+        roleUser.setRoleId(roleId);
+        roleUser.setUuid(UUID.randomUUID().toString());
 
-        for (TblPermissionRole pr :
-                permissionRoles) {
-             TblPermission permission = tblPermissionMapper.selectByPrimaryKey(pr.getPermissionId());
+        TblRoleUserExample example = new TblRoleUserExample();
+        example.createCriteria().andRoleIdEqualTo(roleId).andUserIdEqualTo(userId);
 
-             if (permission != null) {
-                 result.add(permission);
-             }
+        if (tblRoleUserMapper.countByExample(example) > 0) {
+            throw new RuntimeException("the relation `roleUser` " + userId + " " + roleId + " also existed");
         }
 
-        return result;
+        return tblRoleUserMapper.insert(roleUser) > 0;
     }
+
+    @Override
+    public boolean deleteRelationBetweenRoleAndUser(String roleId, String userId) {
+        if (this.hasRelationBetweenRoleAndUser(roleId, userId)) {
+            TblRoleUserExample example = new TblRoleUserExample();
+            example.createCriteria().andUserIdEqualTo(userId).andRoleIdEqualTo(roleId);
+
+            return tblRoleUserMapper.deleteByExample(example) > 0;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean hasRelationBetweenRoleAndUser(String roleId, String userId) {
+        TblRoleUserExample example = new TblRoleUserExample();
+        example.createCriteria().andUserIdEqualTo(userId).andRoleIdEqualTo(roleId);
+
+        return tblRoleUserMapper.selectByExample(example).size() > 0;
+    }
+
 }

@@ -5,36 +5,59 @@ import com.inori.cloud.providerauth.dto.UserLoginDTO;
 import com.inori.cloud.providerauth.pojo.JWT;
 import com.inori.cloud.providerauth.pojo.TblRole;
 import com.inori.cloud.providerauth.pojo.TblUser;
+import com.inori.cloud.providerauth.service.RoleService;
 import com.inori.cloud.providerauth.service.UserService;
 import com.inori.cloud.providerauth.util.BPwdEncoderUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Log4j2
 @Service
 public class AuthService {
-    @Autowired
-    private UserService authService;
     @Qualifier("authServiceHystrix")
     @Autowired
     private AuthServiceClient client;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private RoleService roleService;
 
+    @Transactional
     public boolean register(TblUser user) {
-        return authService.addUser(user);
+        // 如果用户名存在，不允许注册
+        TblUser tmpUser = userService.getUserByUsername(user.getUname());
+        if (tmpUser != null) {
+            throw new RuntimeException("用户名已经存在");
+        }
+        // 添加uuid
+        user.setUuid(UUID.randomUUID().toString());
+        boolean isSuccess = userService.addUser(user);
+        if (isSuccess) {
+            // 如果成功，为此用户添加普通用户角色.
+            TblRole ordRole = roleService.getRoleByRoleCode("ORD_USER");
+            if (ordRole == null) {
+                throw new RuntimeException("注册用户时失败！原因为数据库中不存在名为ORD_USER的角色！");
+            }
+            isSuccess = userService.addRelationBetweenRoleAndUser(ordRole.getUuid(), user.getUuid());
+        }
+
+        return isSuccess;
     }
 
     public List<TblRole> getRolesByUsername(String username) {
-        TblUser user = authService.getUserByUsername(username);
+        TblUser user = userService.getUserByUsername(username);
 
-        return authService.getRolesByUser(user);
+        return userService.getRolesByUser(user);
     }
 
     public UserLoginDTO login(String username, String pwd) {
-        TblUser user = authService.getUserByUsername(username);
+        TblUser user = userService.getUserByUsername(username);
         if (user == null) {
             throw new RuntimeException("用户名不存在");
         }
@@ -49,6 +72,8 @@ public class AuthService {
         UserLoginDTO dto = new UserLoginDTO();
         dto.setJwt(jwt);
         dto.setUser(user);
+
+        // 此处需要写缓存，否则之后操作无法获取用户信息
 
         return dto;
     }

@@ -5,6 +5,7 @@ import com.inori.cloud.providerauth.pojo.TblRole;
 import com.inori.cloud.providerauth.pojo.TblUser;
 import com.inori.cloud.providerauth.service.imp.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,34 +14,36 @@ import java.util.List;
 @RequestMapping("auth")
 public class AuthController {
     @Autowired
-    private AuthService userDetailsService;
+    private AuthService authService;
 
     @GetMapping("auth")
-    @ResponseBody
     public String auth() {
         return "auth desu";
     }
 
     @PostMapping("register")
-    @ResponseBody
     public boolean register(@RequestParam("username")String username,
                             @RequestParam("password")String pwd) {
         TblUser user = new TblUser();
         user.setUpass(pwd);
         user.setUname(username);
-        return userDetailsService.register(user);
+        return authService.register(user);
     }
 
     @PostMapping("login")
-    @ResponseBody
     public UserLoginDTO login(@RequestParam("username")String username,
                               @RequestParam("password")String password) {
-        return userDetailsService.login(username, password);
+        return authService.login(username, password);
     }
 
     @GetMapping("roles")
-    @ResponseBody
     public List<TblRole> authorities(@RequestParam("username")String username) {
-        return userDetailsService.getRolesByUsername(username);
+        return authService.getRolesByUsername(username);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PostMapping("giveRoleToUser")
+    public boolean giveRoleToUser() {
+        return false;
     }
 }

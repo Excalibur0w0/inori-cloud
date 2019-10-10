@@ -13,7 +13,7 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
 server:
-  port: 2010
+  port: 5010
 feign:
   hystrix:
     enabled: true
