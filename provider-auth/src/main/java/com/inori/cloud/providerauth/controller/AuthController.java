@@ -4,10 +4,13 @@ import com.inori.cloud.providerauth.dto.UserLoginDTO;
 import com.inori.cloud.providerauth.pojo.TblRole;
 import com.inori.cloud.providerauth.pojo.TblUser;
 import com.inori.cloud.providerauth.service.imp.AuthService;
+import com.netflix.client.http.HttpHeaders;
+import com.netflix.client.http.HttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController()
@@ -15,6 +18,8 @@ import java.util.List;
 public class AuthController {
     @Autowired
     private AuthService authService;
+    @Autowired
+    private HttpServletRequest request;
 
     @GetMapping("auth")
     public String auth() {
@@ -45,6 +50,17 @@ public class AuthController {
     @PostMapping("giveRoleToUser")
     public boolean giveRoleToUser() {
         return false;
+    }
+
+    @GetMapping("getUserInfoByToken")
+    public TblUser getUserInfoByToken() {
+        String token = request.getHeader("Authorization");
+
+        if (token == null || token.length() <= 0) {
+            throw new RuntimeException("token cannot be empty");
+        }
+
+        return authService.getUserByToken(token);
     }
 
 

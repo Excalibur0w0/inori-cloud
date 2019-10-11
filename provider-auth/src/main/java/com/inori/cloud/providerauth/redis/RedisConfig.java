@@ -1,62 +1,59 @@
 package com.inori.cloud.providerauth.redis;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inori.cloud.providerauth.pojo.TblUser;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig {
-    @Bean
-    JedisConnectionFactory jedisConnectionFactory() {
-        return new JedisConnectionFactory();
-    }
+//    使用此方法需要目标value对象实现序列化接口
+//    @Bean
+//    public RedisTemplate<String, TblUser> redisTemplate(RedisConnectionFactory factory) {
+//        RedisTemplate<String, TblUser> template = new RedisTemplate<String, TblUser>();
+//        template.setConnectionFactory(factory);
+//        template.setKeySerializer(new StringRedisSerializer());
+//        template.setValueSerializer(new RedisObjectSerializer());
+//        return template;
+//    }
 
+//    采用Jackson jdk方式进行序列化。
     @Bean
-    public RedisTemplate<String, TblUser> redisTemplate(RedisConnectionFactory factory) {
-        RedisTemplate<String, TblUser> template = new RedisTemplate<String, TblUser>();
-        template.setConnectionFactory(jedisConnectionFactory());
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        // 配置连接工厂
+        template.setConnectionFactory(factory);
+
+        //使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值（默认使用JDK的序列化方式）
+        Jackson2JsonRedisSerializer jacksonSeial = new Jackson2JsonRedisSerializer(Object.class);
+
+        ObjectMapper om = new ObjectMapper();
+        // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        // 指定序列化输入的类型，类必须是非final修饰的，final修饰的类，比如String,Integer等会跑出异常
+        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        jacksonSeial.setObjectMapper(om);
+
+        // 值采用json序列化
+        template.setValueSerializer(jacksonSeial);
+        //使用StringRedisSerializer来序列化和反序列化redis的key值
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new RedisObjectSerializer());
+
+        // 设置hash key 和value序列化模式
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(jacksonSeial);
+        template.afterPropertiesSet();
+
         return template;
     }
 
-    public class RedisObjectSerializer implements RedisSerializer<Object> {
-
-        private Converter<Object, byte[]> serializer = new SerializingConverter();
-        private Converter<byte[], Object> deserializer = new DeserializingConverter();
-
-        static final byte[] EMPTY_ARRAY = new byte[0];
-
-        public Object deserialize(byte[] bytes) {
-            if (isEmpty(bytes)) {
-                return null;
-            }
-
-            try {
-                return deserializer.convert(bytes);
-            } catch (Exception ex) {
-                throw new SerializationException("Cannot deserialize", ex);
-            }
-        }
-
-        public byte[] serialize(Object object) {
-            if (object == null) {
-                return EMPTY_ARRAY;
-            }
-
-            try {
-                return serializer.convert(object);
-            } catch (Exception ex) {
-                return EMPTY_ARRAY;
-            }
-        }
-
-        private boolean isEmpty(byte[] data) {
-            return (data == null || data.length == 0);
-        }
-    }
 }

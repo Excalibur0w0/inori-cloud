@@ -5,6 +5,7 @@ import com.inori.cloud.providerauth.dto.UserLoginDTO;
 import com.inori.cloud.providerauth.pojo.JWT;
 import com.inori.cloud.providerauth.pojo.TblRole;
 import com.inori.cloud.providerauth.pojo.TblUser;
+import com.inori.cloud.providerauth.redis.CacheUserToken;
 import com.inori.cloud.providerauth.service.RoleService;
 import com.inori.cloud.providerauth.service.UserService;
 import com.inori.cloud.providerauth.util.BPwdEncoderUtil;
@@ -27,6 +28,8 @@ public class AuthService {
     private UserService userService;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private CacheUserToken cacheUserToken;
 
     @Transactional
     public boolean register(TblUser user) {
@@ -66,6 +69,7 @@ public class AuthService {
         }
         // 客户端 provider-auth:123456 的base64缩写
         JWT jwt = client.getToken("Basic cHJvdmlkZXItYXV0aDoxMjM0NTY=", "password", username, pwd);
+        log.warn(username + " " + pwd + " token: " + jwt);
         if (jwt == null) {
             throw new RuntimeException("用户token有问题");
         }
@@ -74,7 +78,12 @@ public class AuthService {
         dto.setUser(user);
 
         // 此处需要写缓存，否则之后操作无法获取用户信息
+        cacheUserToken.set(jwt.getAccess_token(), user);
 
         return dto;
+    }
+
+    public TblUser getUserByToken(String token) {
+        return cacheUserToken.get(token);
     }
 }
