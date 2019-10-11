@@ -21,7 +21,6 @@ import java.util.UUID;
 @Log4j2
 @Service
 public class AuthService {
-    @Qualifier("authServiceHystrix")
     @Autowired
     private AuthServiceClient client;
     @Autowired

@@ -1,5 +1,7 @@
 package com.inori.cloud.providerauth.controller;
 
+import com.inori.cloud.providerauth.client.DemoServiceClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -10,9 +12,18 @@ import java.security.Principal;
 
 @RestController
 public class DemoController {
+
+    @Autowired
+    private DemoServiceClient client;
+
     @RequestMapping("/hi")
     public String hi() {
         return "hi, 你好";
+    }
+
+    @RequestMapping("/demo")
+    public String test() {
+        return client.consumer();
     }
 
     @RequestMapping("/hello")
