@@ -18,8 +18,6 @@ import java.util.List;
 public class AuthController {
     @Autowired
     private AuthService authService;
-    @Autowired
-    private HttpServletRequest request;
 
     @GetMapping("auth")
     public String auth() {
@@ -43,19 +41,24 @@ public class AuthController {
 
     @GetMapping("roles")
     public List<TblRole> authorities(@RequestParam("username")String username) {
+        // 获取角色的权限
         return authService.getRolesByUsername(username);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'PERMIT_ALL')")
     @PostMapping("giveRoleToUser")
-    public boolean giveRoleToUser() {
-        return false;
+    public boolean giveRoleToUser(@RequestParam("role_code")String roleCode,
+                                  @RequestHeader("Authorization") String token) {
+        TblUser user = authService.getUserByToken(token);
+        if (user != null) {
+            return authService.giveRoleToUser(roleCode, user.getUuid());
+        } else {
+            throw new RuntimeException("用户签名无效，清重新登陆或申请!");
+        }
     }
 
     @GetMapping("getUserInfoByToken")
-    public TblUser getUserInfoByToken() {
-        String token = request.getHeader("Authorization");
-
+    public TblUser getUserInfoByToken(@RequestHeader("Authorization") String token) {
         if (token == null || token.length() <= 0) {
             throw new RuntimeException("token cannot be empty");
         }

@@ -1,11 +1,7 @@
 package com.inori.cloud.oauth2.util;
 
-import com.inori.cloud.oauth2.dao.RoleDao;
-import com.inori.cloud.oauth2.dao.RoleUserDao;
-import com.inori.cloud.oauth2.dao.UserDao;
-import com.inori.cloud.oauth2.pojo.TblRole;
-import com.inori.cloud.oauth2.pojo.TblRoleUser;
-import com.inori.cloud.oauth2.pojo.TblUser;
+import com.inori.cloud.oauth2.dao.*;
+import com.inori.cloud.oauth2.pojo.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +27,10 @@ public class InoriUserDetailsService implements UserDetailsService {
     private RoleDao roleDao;
     @Autowired
     private RoleUserDao roleUserDao;
+    @Autowired
+    private PermissionDao permissionDao;
+    @Autowired
+    private PermissionRoleDao permissionRoleDao;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -39,10 +39,20 @@ public class InoriUserDetailsService implements UserDetailsService {
         TblRoleUser crit = new TblRoleUser();
         crit.setUserId(user.getUuid());
         Example<TblRoleUser> example = Example.of(crit);
-        List<InoriGrantedAuthority> authorities = new LinkedList<>();
+        List<GrantedAuthority> authorities = new LinkedList<>();
 
         roleUserDao.findAll(example).forEach(ru -> {
-            roleDao.findById(ru.getRoleId()).ifPresent(role -> authorities.add(new InoriGrantedAuthority(role)));
+            roleDao.findById(ru.getRoleId()).ifPresent(role -> {
+                authorities.add(new RoleGrantedAuthority(role));
+                // 根据roleId查找permisison
+                TblPermissionRole crit2 = new TblPermissionRole();
+                crit2.setRoleId(role.getUuid());
+
+                permissionRoleDao.findAll(Example.of(crit2)).forEach(pr -> {
+                    permissionDao.findById(pr.getPermissionId()).ifPresent(p ->
+                            authorities.add(new PermissionGrantedAuthority(p)));
+                });
+            });
         });
 
         return new InroiUserDetails(authorities, user);
@@ -51,12 +61,12 @@ public class InoriUserDetailsService implements UserDetailsService {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    private class InoriGrantedAuthority implements GrantedAuthority {
+    private class RoleGrantedAuthority implements GrantedAuthority {
         private TblRole role;
 
         @Override
         public String getAuthority() {
-            log.info("调用了getAuthority: " + role.getRoleCode());
+//            log.info("调用了getAuthority: " + role.getRoleCode());
             return "ROLE_" + role.getRoleCode();
         }
     }
@@ -64,8 +74,20 @@ public class InoriUserDetailsService implements UserDetailsService {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    private class PermissionGrantedAuthority implements GrantedAuthority {
+        private TblPermission permission;
+
+        @Override
+        public String getAuthority() {
+            return permission.getPermissionCode();
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     private class InroiUserDetails implements UserDetails {
-        private List<InoriGrantedAuthority> authorities;
+        private List<GrantedAuthority> authorities;
         private TblUser curUser;
 
         @Override

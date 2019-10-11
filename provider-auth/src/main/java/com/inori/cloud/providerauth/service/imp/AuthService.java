@@ -85,4 +85,8 @@ public class AuthService {
     public TblUser getUserByToken(String token) {
         return cacheUserToken.get(token);
     }
+
+    public boolean giveRoleToUser(String roleCode, String user_id) {
+        return false;
+    }
 }
