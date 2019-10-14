@@ -14,4 +14,5 @@ public interface RoleService {
     TblRole getRolebyId(String roleId);
     TblRole getRoleByRoleCode(String roleCode);
     boolean addRelationBetweenRoleAndPermission(String roleId, String permissionId);
+    boolean deleteRelationBetweenRoleAndPermission(String roleId, String permissionId);
 }

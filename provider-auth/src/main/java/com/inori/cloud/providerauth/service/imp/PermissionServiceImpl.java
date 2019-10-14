@@ -39,4 +39,23 @@ public class PermissionServiceImpl implements PermissionService {
     public List<TblPermission> getAllPermissions() {
         return tblPermissionMapper.selectByExample(new TblPermissionExample());
     }
+
+    @Override
+    public TblPermission getById(String permission_id) {
+        return tblPermissionMapper.selectByPrimaryKey(permission_id);
+    }
+
+    @Override
+    public TblPermission getByPermissionCode(String permission_code) {
+        TblPermissionExample example = new TblPermissionExample();
+        example.createCriteria().andPermissionCodeEqualTo(permission_code);
+        List<TblPermission> result = tblPermissionMapper.selectByExample(example);
+
+        if (result != null && result.size() >= 1) {
+            return result.get(0);
+        } else {
+            return null;
+        }
+
+    }
 }

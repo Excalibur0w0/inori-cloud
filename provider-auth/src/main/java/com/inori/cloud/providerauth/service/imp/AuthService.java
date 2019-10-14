@@ -2,10 +2,9 @@ package com.inori.cloud.providerauth.service.imp;
 
 import com.inori.cloud.providerauth.client.AuthServiceClient;
 import com.inori.cloud.providerauth.dto.UserLoginDTO;
-import com.inori.cloud.providerauth.pojo.JWT;
-import com.inori.cloud.providerauth.pojo.TblRole;
-import com.inori.cloud.providerauth.pojo.TblUser;
+import com.inori.cloud.providerauth.pojo.*;
 import com.inori.cloud.providerauth.redis.CacheUserToken;
+import com.inori.cloud.providerauth.service.PermissionService;
 import com.inori.cloud.providerauth.service.RoleService;
 import com.inori.cloud.providerauth.service.UserService;
 import com.inori.cloud.providerauth.util.BPwdEncoderUtil;
@@ -27,6 +26,8 @@ public class AuthService {
     private UserService userService;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private PermissionService permissionService;
     @Autowired
     private CacheUserToken cacheUserToken;
 
@@ -87,6 +88,37 @@ public class AuthService {
     }
 
     public boolean giveRoleToUser(String roleCode, String user_id) {
-        return false;
+        TblRole role = roleService.getRoleByRoleCode(roleCode);
+
+        if (role != null) {
+            return userService.addRelationBetweenRoleAndUser(role.getUuid(), user_id);
+        } else {
+            throw new RuntimeException("不存在ROLE_CODE为" + roleCode + "的角色");
+        }
+    }
+
+    // 撤销角色权限
+    public boolean revokeRoleFromUser(String roleCode, String user_id) {
+        TblRole role = roleService.getRoleByRoleCode(roleCode);
+
+        if (role != null) {
+            return userService.deleteRelationBetweenRoleAndUser(role.getUuid(), user_id);
+        } else {
+            throw new RuntimeException("不存在ROLE_CODE为" + roleCode + "的角色");
+        }
+    }
+
+    public boolean givePermissionToRole(String roleCode, String permissionCode) {
+        TblPermission permission = permissionService.getByPermissionCode(permissionCode);
+        TblRole role = roleService.getRoleByRoleCode(roleCode);
+
+        return roleService.addRelationBetweenRoleAndPermission(role.getUuid(), permission.getUuid());
+    }
+
+    public boolean revokePermissionFromRole(String roleCode, String permissionCode) {
+        TblPermission permission = permissionService.getByPermissionCode(permissionCode);
+        TblRole role = roleService.getRoleByRoleCode(roleCode);
+
+        return roleService.deleteRelationBetweenRoleAndPermission(role.getUuid(), permission.getUuid());
     }
 }

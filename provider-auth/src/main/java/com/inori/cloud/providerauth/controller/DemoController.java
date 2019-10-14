@@ -26,6 +26,12 @@ public class DemoController {
         return client.consumer();
     }
 
+    @PreAuthorize("hasAnyAuthority('PERMIT_ALL')")
+    @RequestMapping("/test_permission_isuseful")
+    public String testPermissionIsUseful() {
+        return "success";
+    }
+
     @RequestMapping("/hello")
     @PreAuthorize("hasAnyAuthority('ROLE_TEST','ROLE_ADMIN')")
     public String hello() {

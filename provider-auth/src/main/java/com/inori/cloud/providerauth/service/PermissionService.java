@@ -9,4 +9,6 @@ public interface PermissionService {
     boolean delPermission(String permissionId);
     boolean updatePermission(TblPermission permission, String permissionId);
     List<TblPermission> getAllPermissions();
+    TblPermission getById(String permission_id);
+    TblPermission getByPermissionCode(String permission_code);
 }

@@ -6,6 +6,8 @@
       <module fileurl="file://$PROJECT_DIR$/demo/demo.iml" filepath="$PROJECT_DIR$/demo/demo.iml" />
       <module fileurl="file://$PROJECT_DIR$/oauth2/oauth2.iml" filepath="$PROJECT_DIR$/oauth2/oauth2.iml" />
       <module fileurl="file://$PROJECT_DIR$/provider-auth/provider-auth.iml" filepath="$PROJECT_DIR$/provider-auth/provider-auth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/provider-comment/provider-comment.iml" filepath="$PROJECT_DIR$/provider-comment/provider-comment.iml" />
+      <module fileurl="file://$PROJECT_DIR$/provider-music/provider-music.iml" filepath="$PROJECT_DIR$/provider-music/provider-music.iml" />
       <module fileurl="file://$PROJECT_DIR$/server-center/server-center.iml" filepath="$PROJECT_DIR$/server-center/server-center.iml" />
     </modules>
   </component>

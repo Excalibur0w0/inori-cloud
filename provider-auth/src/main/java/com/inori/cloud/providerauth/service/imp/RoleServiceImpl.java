@@ -91,4 +91,12 @@ public class RoleServiceImpl implements RoleService {
 
         return tblPermissionRoleMapper.insert(permissionRole) > 0;
     }
+
+    @Override
+    public boolean deleteRelationBetweenRoleAndPermission(String roleId, String permissionId) {
+        TblPermissionRoleExample example = new TblPermissionRoleExample();
+        example.createCriteria().andRoleIdEqualTo(roleId).andPermissionIdEqualTo(permissionId);
+
+        return tblPermissionRoleMapper.deleteByExample(example) > 0;
+    }
 }

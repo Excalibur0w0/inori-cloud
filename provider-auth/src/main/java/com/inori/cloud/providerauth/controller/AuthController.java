@@ -25,8 +25,8 @@ public class AuthController {
     }
 
     @PostMapping("register")
-    public boolean register(@RequestParam("username")String username,
-                            @RequestParam("password")String pwd) {
+    public boolean register(@RequestParam("username") String username,
+                            @RequestParam("password") String pwd) {
         TblUser user = new TblUser();
         user.setUpass(pwd);
         user.setUname(username);
@@ -34,20 +34,20 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    public UserLoginDTO login(@RequestParam("username")String username,
-                              @RequestParam("password")String password) {
+    public UserLoginDTO login(@RequestParam("username") String username,
+                              @RequestParam("password") String password) {
         return authService.login(username, password);
     }
 
     @GetMapping("roles")
-    public List<TblRole> authorities(@RequestParam("username")String username) {
+    public List<TblRole> authorities(@RequestParam("username") String username) {
         // 获取角色的权限
         return authService.getRolesByUsername(username);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'PERMIT_ALL')")
     @PostMapping("giveRoleToUser")
-    public boolean giveRoleToUser(@RequestParam("role_code")String roleCode,
+    public boolean giveRoleToUser(@RequestParam("role_code") String roleCode,
                                   @RequestHeader("Authorization") String token) {
         TblUser user = authService.getUserByToken(token);
         if (user != null) {
@@ -55,6 +55,32 @@ public class AuthController {
         } else {
             throw new RuntimeException("用户签名无效，清重新登陆或申请!");
         }
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'PERMIT_ALL')")
+    @PostMapping("revokeRoleFromUser")
+    public boolean revokeRoleFromUser(@RequestParam("role_code") String roleCode,
+                                      @RequestHeader("Authorization") String token) {
+        TblUser user = authService.getUserByToken(token);
+        if (user != null) {
+            return authService.revokeRoleFromUser(roleCode, user.getUuid());
+        } else {
+            throw new RuntimeException("用户签名无效，清重新登陆或申请!");
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'PERMIT_ALL')")
+    @PostMapping("givePermissionToRole")
+    public boolean givePermisisonToRole(@RequestParam("permission_code") String permissionCode,
+                                        @RequestParam("role_code") String roleCode) {
+        return authService.givePermissionToRole(roleCode, permissionCode);
+    }
+
+    @PreAuthorize("hasAngAuthority('ROLE_ADMIN', 'PERMIT_ALL')")
+    @PostMapping("revokePermissionFromRole")
+    public boolean revokePermissionFromRole(@RequestParam("permission_code") String permissionCode,
+                                            @RequestParam("role_code") String roleCode) {
+        return authService.revokePermissionFromRole(roleCode, permissionCode);
     }
 
     @GetMapping("getUserInfoByToken")
@@ -65,6 +91,4 @@ public class AuthController {
 
         return authService.getUserByToken(token);
     }
-
-
 }
