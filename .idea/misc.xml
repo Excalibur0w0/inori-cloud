@@ -13,6 +13,7 @@
         <option value="$PROJECT_DIR$/demo/pom.xml" />
         <option value="$PROJECT_DIR$/provider-music/pom.xml" />
         <option value="$PROJECT_DIR$/provider-comment/pom.xml" />
+        <option value="$PROJECT_DIR$/api-gateway/pom.xml" />
       </list>
     </option>
   </component>

@@ -17,3 +17,5 @@ eureka:
       defaultZone: http://localhost:3001/eureka
 #    register-with-eureka: false
 #    fetch-registry: false
+server:
+  port: 8989

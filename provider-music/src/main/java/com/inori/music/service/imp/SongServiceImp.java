@@ -7,10 +7,12 @@ import com.inori.music.pojo.TblSong;
 import com.inori.music.service.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Service
 public class SongServiceImp implements SongService {
     @Autowired
     private TblSongDao tblSongDao;

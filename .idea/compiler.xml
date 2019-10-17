@@ -7,15 +7,17 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="provider-music" />
-        <module name="demo" />
-        <module name="provider-auth" />
-        <module name="consumer-auth" />
-        <module name="server-center" />
         <module name="provider-comment" />
+        <module name="demo" />
+        <module name="consumer-auth" />
+        <module name="api-gateway" />
+        <module name="server-center" />
+        <module name="provider-auth" />
         <module name="oauth2" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="api-gateway" target="1.8" />
       <module name="consumer-auth" target="1.8" />
       <module name="demo" target="1.8" />
       <module name="oauth2" target="1.8" />
@@ -27,6 +29,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="-parameters" />
       <module name="consumer-auth" options="-parameters" />
       <module name="demo" options="-parameters" />
       <module name="oauth2" options="-parameters" />

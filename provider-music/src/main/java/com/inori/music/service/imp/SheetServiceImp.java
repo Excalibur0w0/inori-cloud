@@ -10,6 +10,7 @@ import com.inori.music.pojo.TblSong;
 import com.inori.music.service.SheetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -17,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class SheetServiceImp implements SheetService {
     @Autowired
     private TblSheetDao tblSheetDao;
@@ -73,6 +75,27 @@ public class SheetServiceImp implements SheetService {
             tblSheetSongDao.saveAll(sheetSongs);
         }
 
+        return resSheet;
+    }
+
+    @Transactional
+    @Override
+    public TblSheet createSheetBySongsId(TblSheet sheet, List<String> songIds, String authorId) {
+        Date now = new Date(System.currentTimeMillis());
+
+        sheet.setUuid(UUID.randomUUID().toString());
+        sheet.setCreatedAt(now);
+        sheet.setUpdatedAt(now);
+        sheet.setShtCreator(authorId);
+
+        TblSheet resSheet = tblSheetDao.save(sheet);
+
+        if (resSheet != null) {
+            List<TblSheetSong> sheetSongs = new LinkedList<>();
+            songIds.forEach(songId -> sheetSongs.add(
+                    new TblSheetSong(UUID.randomUUID().toString(), songId, resSheet.getUuid())));
+            tblSheetSongDao.saveAll(sheetSongs);
+        }
         return resSheet;
     }
 

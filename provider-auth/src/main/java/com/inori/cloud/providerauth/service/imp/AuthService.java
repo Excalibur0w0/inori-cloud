@@ -77,6 +77,7 @@ public class AuthService {
         dto.setJwt(jwt);
         dto.setUser(user);
 
+        System.out.println(jwt.getAccess_token());
         // 此处需要写缓存，否则之后操作无法获取用户信息
         cacheUserToken.set(jwt.getAccess_token(), user);
 
@@ -84,7 +85,8 @@ public class AuthService {
     }
 
     public TblUser getUserByToken(String token) {
-        return cacheUserToken.get(token);
+        // 因为传递的token 是以 Bearer[空格]打头的，所以在取出token 的时候先截取掉前7位。
+        return cacheUserToken.get(token.substring(7));
     }
 
     public boolean giveRoleToUser(String roleCode, String user_id) {

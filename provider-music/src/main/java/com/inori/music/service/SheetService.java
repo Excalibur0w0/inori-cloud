@@ -17,6 +17,9 @@ public interface SheetService {
 
     TblSheet createSheetBySongs(TblSheet sheet, List<TblSong> tblSongs, String userId);
 
+    // 如果部队songId作安全性验证，很可能不能保证数据一致性，重构时需要注意
+    TblSheet createSheetBySongsId(TblSheet sheet, List<String> songIds, String authorId);
+
     void deleteSheet(String shtId);
 
     /**

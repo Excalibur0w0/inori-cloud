@@ -4,9 +4,23 @@ spring:
     name: api-gateway
 
 server:
-  port: 1101
+  port: 5333
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:1001/eureka/
+      defaultZone: http://localhost:3001/eureka/
+
+zuul:
+  routes:
+    provider-auth:
+      sensitive-headers:
+      custom-sensitive-headers: true
+    demo:
+      sensitive-headers:
+      custom-sensitive-headers: true
+    provider-music:
+      sensitive-headers:
+      custom-sensitive-headers: true
+#  开启全部
+#  sensitive-headers:
