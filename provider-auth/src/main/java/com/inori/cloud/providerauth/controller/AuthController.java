@@ -1,8 +1,10 @@
 package com.inori.cloud.providerauth.controller;
 
+import com.inori.cloud.providerauth.dto.UserBasicDTO;
 import com.inori.cloud.providerauth.dto.UserLoginDTO;
 import com.inori.cloud.providerauth.pojo.TblRole;
 import com.inori.cloud.providerauth.pojo.TblUser;
+import com.inori.cloud.providerauth.service.UserService;
 import com.inori.cloud.providerauth.service.imp.AuthService;
 import com.netflix.client.http.HttpHeaders;
 import com.netflix.client.http.HttpRequest;
@@ -18,6 +20,8 @@ import java.util.List;
 public class AuthController {
     @Autowired
     private AuthService authService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("auth")
     public String auth() {
@@ -90,5 +94,18 @@ public class AuthController {
         }
 
         return authService.getUserByToken(token);
+    }
+
+    @GetMapping("getUserBasicInfo")
+    public UserBasicDTO getUserBasicInfo(@RequestParam("userId")String userId) {
+        TblUser user = userService.getUserById(userId);
+        UserBasicDTO dto = new UserBasicDTO();
+
+        dto.setAge(user.getAge());
+        dto.setCity(user.getCity());
+        dto.setUname(user.getUname());
+        dto.setUuid(user.getUuid());
+
+        return dto;
     }
 }

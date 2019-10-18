@@ -9,6 +9,8 @@ public class TblUser {
 
     private String upass;
 
+    private String city;
+
     public String getUuid() {
         return uuid;
     }
@@ -39,5 +41,14 @@ public class TblUser {
 
     public void setUpass(String upass) {
         this.upass = upass == null ? null : upass.trim();
+    }
+
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

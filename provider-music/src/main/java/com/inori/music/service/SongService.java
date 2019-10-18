@@ -2,6 +2,8 @@ package com.inori.music.service;
 
 import com.inori.music.pojo.TblSong;
 
+import java.util.List;
+
 public interface SongService {
     TblSong getById(String songId);
 
@@ -10,4 +12,14 @@ public interface SongService {
     TblSong searchSong(String keywords);
 
     void dislikeSong(String songId, String userId);
+
+    List<TblSong> getSongsByShtId(String shtId);
+
+    Long countSongsByShtId(String shtId);
+
+    List<TblSong> getSongsByUploader(String uploadUserId);
+
+    Long countSongByUploader(String uploadUserId);
+
+    List<TblSong> getAll();
 }

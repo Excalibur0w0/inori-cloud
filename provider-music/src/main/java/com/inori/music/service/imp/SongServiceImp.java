@@ -1,14 +1,18 @@
 package com.inori.music.service.imp;
 
 import com.inori.music.dao.TblLikeSongDao;
+import com.inori.music.dao.TblSheetSongDao;
 import com.inori.music.dao.TblSongDao;
 import com.inori.music.pojo.TblLikeSong;
+import com.inori.music.pojo.TblSheetSong;
 import com.inori.music.pojo.TblSong;
 import com.inori.music.service.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -18,6 +22,8 @@ public class SongServiceImp implements SongService {
     private TblSongDao tblSongDao;
     @Autowired
     private TblLikeSongDao tblLikeSongDao;
+    @Autowired
+    private TblSheetSongDao tblSheetSongDao;
 
     @Override
     public TblSong getById(String songId) {
@@ -56,6 +62,49 @@ public class SongServiceImp implements SongService {
         } else {
             throw new RuntimeException("试图删除不存在的关系： userId: " + userId + " songId" + songId);
         }
+    }
+
+    @Override
+    public List<TblSong> getSongsByShtId(String shtId) {
+        TblSheetSong example = new TblSheetSong();
+        example.setShtId(shtId);
+        List<TblSheetSong> sheetSongSet = tblSheetSongDao.findAll(Example.of(example));
+        List<TblSong> resultSet = new LinkedList<>();
+
+
+        sheetSongSet.forEach(ss -> tblSongDao.findById(ss.getSongId())
+                .ifPresent(var -> resultSet.add(var)));
+
+        return resultSet;
+    }
+
+    @Override
+    public Long countSongsByShtId(String shtId) {
+        TblSheetSong example = new TblSheetSong();
+        example.setShtId(shtId);
+
+        return tblSheetSongDao.count(Example.of(example));
+    }
+
+    @Override
+    public List<TblSong> getSongsByUploader(String uploadUserId) {
+        TblSong example = new TblSong();
+        example.setSongUploader(uploadUserId);
+
+        return tblSongDao.findAll(Example.of(example));
+    }
+
+    @Override
+    public Long countSongByUploader(String uploadUserId) {
+        TblSong example = new TblSong();
+        example.setSongUploader(uploadUserId);
+
+        return tblSongDao.count(Example.of(example));
+    }
+
+    @Override
+    public List<TblSong> getAll() {
+        return tblSongDao.findAll();
     }
 
 }

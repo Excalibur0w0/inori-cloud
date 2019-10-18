@@ -3,6 +3,7 @@ package com.inori.music.service.imp;
 import com.inori.music.dao.TblSheetDao;
 import com.inori.music.dao.TblSheetSongDao;
 import com.inori.music.dao.TblSheetUserDao;
+import com.inori.music.dto.SheetDTO;
 import com.inori.music.pojo.TblSheet;
 import com.inori.music.pojo.TblSheetSong;
 import com.inori.music.pojo.TblSheetUser;
@@ -35,8 +36,41 @@ public class SheetServiceImp implements SheetService {
     }
 
     @Override
+    public SheetDTO findDTOById(String sheetId) {
+        return null;
+
+    }
+
+    @Override
     public List<TblSheet> findAll() {
         return tblSheetDao.findAll();
+    }
+
+    @Override
+    public List<TblSheet> findByCreator(String authorId) {
+        TblSheet example = new TblSheet();
+
+        example.setShtCreator(authorId);
+        List<TblSheet> res = tblSheetDao.findAll(Example.of(example));
+
+        return res;
+    }
+
+    @Override
+    public List<TblSheet> findByCollector(String collectUserId) {
+        List<TblSheet> result = null;
+        TblSheetUser example = new TblSheetUser();
+        example.setUserId(collectUserId);
+        List<TblSheetUser> sus = tblSheetUserDao.findAll(Example.of(example));
+
+        if (sus != null) {
+            result = new LinkedList<>();
+            List<TblSheet> finalResult = result;
+            sus.forEach(su -> tblSheetDao.findById(su.getShtId())
+                    .ifPresent(s -> finalResult.add(s)));
+        }
+
+        return result;
     }
 
     @Override
@@ -132,5 +166,19 @@ public class SheetServiceImp implements SheetService {
         tblSheetUser.setUserId(userId);
 
         return tblSheetUserDao.save(tblSheetUser);
+    }
+
+    @Override
+    public TblSheet updateSheet(String sheetId, TblSheet newSheet) {
+        TblSheet target = tblSheetDao.findById(sheetId).orElse(null);
+        Date now = new Date(System.currentTimeMillis());
+
+        if (target != null) {
+            target.setShtDesc(newSheet.getShtDesc());
+            target.setShtName(newSheet.getShtName());
+            target.setUpdatedAt(now);
+        }
+
+        return tblSheetDao.save(target);
     }
 }
