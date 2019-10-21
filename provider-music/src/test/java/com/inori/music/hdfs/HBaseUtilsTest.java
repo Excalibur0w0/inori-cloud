@@ -14,7 +14,7 @@ import java.util.List;
 
 public class HBaseUtilsTest {
 
-    private static final String TABLE_NAME = "class";
+    private static final String TABLE_NAME = "tbl_song";
     private static final String TEACHER = "teacher";
     private static final String STUDENT = "student";
 
@@ -52,7 +52,6 @@ public class HBaseUtilsTest {
             System.out.println(Bytes
                     .toString(result.getValue(Bytes.toBytes(STUDENT), Bytes.toBytes("name"))));
         }
-
     }
 
     @Test

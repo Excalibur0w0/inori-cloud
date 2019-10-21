@@ -27,6 +27,16 @@ public class HBaseUtils {
         }
     }
 
+    public static boolean isTableExist(String tableName) throws IOException {
+        HBaseAdmin admin = null;
+        try {
+            admin = (HBaseAdmin) connection.getAdmin();
+            return admin.tableExists(TableName.valueOf(tableName));
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
     /**
      * 创建HBase表
      *

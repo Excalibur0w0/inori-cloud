@@ -41,4 +41,7 @@ public class TblSong {
 
     @Column
     private String songAlbum;
+
+    @Column
+    private String storePath;
 }
