@@ -3,8 +3,8 @@
 <mapper namespace="com.inori.cloud.providerauth.dao.mapper.TblPermissionRoleMapper" >
   <resultMap id="BaseResultMap" type="com.inori.cloud.providerauth.pojo.TblPermissionRole" >
     <id column="uuid" property="uuid" jdbcType="VARCHAR" />
-    <result column="role_id" property="roleId" jdbcType="VARCHAR" />
     <result column="permission_id" property="permissionId" jdbcType="VARCHAR" />
+    <result column="role_id" property="roleId" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -65,7 +65,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    uuid, role_id, permission_id
+    uuid, permission_id, role_id
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.inori.cloud.providerauth.pojo.TblPermissionRoleExample" >
     select
@@ -98,9 +98,9 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.inori.cloud.providerauth.pojo.TblPermissionRole" >
-    insert into tbl_permission_role (uuid, role_id, permission_id
+    insert into tbl_permission_role (uuid, permission_id, role_id
       )
-    values (#{uuid,jdbcType=VARCHAR}, #{roleId,jdbcType=VARCHAR}, #{permissionId,jdbcType=VARCHAR}
+    values (#{uuid,jdbcType=VARCHAR}, #{permissionId,jdbcType=VARCHAR}, #{roleId,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.inori.cloud.providerauth.pojo.TblPermissionRole" >
@@ -109,22 +109,22 @@
       <if test="uuid != null" >
         uuid,
       </if>
-      <if test="roleId != null" >
-        role_id,
-      </if>
       <if test="permissionId != null" >
         permission_id,
+      </if>
+      <if test="roleId != null" >
+        role_id,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="uuid != null" >
         #{uuid,jdbcType=VARCHAR},
       </if>
-      <if test="roleId != null" >
-        #{roleId,jdbcType=VARCHAR},
-      </if>
       <if test="permissionId != null" >
         #{permissionId,jdbcType=VARCHAR},
+      </if>
+      <if test="roleId != null" >
+        #{roleId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -140,11 +140,11 @@
       <if test="record.uuid != null" >
         uuid = #{record.uuid,jdbcType=VARCHAR},
       </if>
-      <if test="record.roleId != null" >
-        role_id = #{record.roleId,jdbcType=VARCHAR},
-      </if>
       <if test="record.permissionId != null" >
         permission_id = #{record.permissionId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.roleId != null" >
+        role_id = #{record.roleId,jdbcType=VARCHAR},
       </if>
     </set>
     <if test="_parameter != null" >
@@ -154,8 +154,8 @@
   <update id="updateByExample" parameterType="map" >
     update tbl_permission_role
     set uuid = #{record.uuid,jdbcType=VARCHAR},
-      role_id = #{record.roleId,jdbcType=VARCHAR},
-      permission_id = #{record.permissionId,jdbcType=VARCHAR}
+      permission_id = #{record.permissionId,jdbcType=VARCHAR},
+      role_id = #{record.roleId,jdbcType=VARCHAR}
     <if test="_parameter != null" >
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -163,19 +163,19 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.inori.cloud.providerauth.pojo.TblPermissionRole" >
     update tbl_permission_role
     <set >
-      <if test="roleId != null" >
-        role_id = #{roleId,jdbcType=VARCHAR},
-      </if>
       <if test="permissionId != null" >
         permission_id = #{permissionId,jdbcType=VARCHAR},
+      </if>
+      <if test="roleId != null" >
+        role_id = #{roleId,jdbcType=VARCHAR},
       </if>
     </set>
     where uuid = #{uuid,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.inori.cloud.providerauth.pojo.TblPermissionRole" >
     update tbl_permission_role
-    set role_id = #{roleId,jdbcType=VARCHAR},
-      permission_id = #{permissionId,jdbcType=VARCHAR}
+    set permission_id = #{permissionId,jdbcType=VARCHAR},
+      role_id = #{roleId,jdbcType=VARCHAR}
     where uuid = #{uuid,jdbcType=VARCHAR}
   </update>
 </mapper>

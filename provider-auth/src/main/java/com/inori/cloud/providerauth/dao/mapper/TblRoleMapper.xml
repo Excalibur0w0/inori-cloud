@@ -3,8 +3,8 @@
 <mapper namespace="com.inori.cloud.providerauth.dao.mapper.TblRoleMapper" >
   <resultMap id="BaseResultMap" type="com.inori.cloud.providerauth.pojo.TblRole" >
     <id column="uuid" property="uuid" jdbcType="VARCHAR" />
-    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
     <result column="role_code" property="roleCode" jdbcType="VARCHAR" />
+    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -65,7 +65,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    uuid, role_name, role_code
+    uuid, role_code, role_name
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.inori.cloud.providerauth.pojo.TblRoleExample" >
     select
@@ -98,9 +98,9 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.inori.cloud.providerauth.pojo.TblRole" >
-    insert into tbl_role (uuid, role_name, role_code
+    insert into tbl_role (uuid, role_code, role_name
       )
-    values (#{uuid,jdbcType=VARCHAR}, #{roleName,jdbcType=VARCHAR}, #{roleCode,jdbcType=VARCHAR}
+    values (#{uuid,jdbcType=VARCHAR}, #{roleCode,jdbcType=VARCHAR}, #{roleName,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.inori.cloud.providerauth.pojo.TblRole" >
@@ -109,22 +109,22 @@
       <if test="uuid != null" >
         uuid,
       </if>
-      <if test="roleName != null" >
-        role_name,
-      </if>
       <if test="roleCode != null" >
         role_code,
+      </if>
+      <if test="roleName != null" >
+        role_name,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="uuid != null" >
         #{uuid,jdbcType=VARCHAR},
       </if>
-      <if test="roleName != null" >
-        #{roleName,jdbcType=VARCHAR},
-      </if>
       <if test="roleCode != null" >
         #{roleCode,jdbcType=VARCHAR},
+      </if>
+      <if test="roleName != null" >
+        #{roleName,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -140,11 +140,11 @@
       <if test="record.uuid != null" >
         uuid = #{record.uuid,jdbcType=VARCHAR},
       </if>
-      <if test="record.roleName != null" >
-        role_name = #{record.roleName,jdbcType=VARCHAR},
-      </if>
       <if test="record.roleCode != null" >
         role_code = #{record.roleCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.roleName != null" >
+        role_name = #{record.roleName,jdbcType=VARCHAR},
       </if>
     </set>
     <if test="_parameter != null" >
@@ -154,8 +154,8 @@
   <update id="updateByExample" parameterType="map" >
     update tbl_role
     set uuid = #{record.uuid,jdbcType=VARCHAR},
-      role_name = #{record.roleName,jdbcType=VARCHAR},
-      role_code = #{record.roleCode,jdbcType=VARCHAR}
+      role_code = #{record.roleCode,jdbcType=VARCHAR},
+      role_name = #{record.roleName,jdbcType=VARCHAR}
     <if test="_parameter != null" >
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -163,19 +163,19 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.inori.cloud.providerauth.pojo.TblRole" >
     update tbl_role
     <set >
-      <if test="roleName != null" >
-        role_name = #{roleName,jdbcType=VARCHAR},
-      </if>
       <if test="roleCode != null" >
         role_code = #{roleCode,jdbcType=VARCHAR},
+      </if>
+      <if test="roleName != null" >
+        role_name = #{roleName,jdbcType=VARCHAR},
       </if>
     </set>
     where uuid = #{uuid,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.inori.cloud.providerauth.pojo.TblRole" >
     update tbl_role
-    set role_name = #{roleName,jdbcType=VARCHAR},
-      role_code = #{roleCode,jdbcType=VARCHAR}
+    set role_code = #{roleCode,jdbcType=VARCHAR},
+      role_name = #{roleName,jdbcType=VARCHAR}
     where uuid = #{uuid,jdbcType=VARCHAR}
   </update>
 </mapper>

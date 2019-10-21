@@ -1,6 +1,7 @@
 package com.inori.cloud.providerauth.service.imp;
 
 import com.inori.cloud.providerauth.dao.mapper.*;
+import com.inori.cloud.providerauth.dto.UserBasicDTO;
 import com.inori.cloud.providerauth.pojo.*;
 import com.inori.cloud.providerauth.service.UserService;
 import com.inori.cloud.providerauth.util.BPwdEncoderUtil;
@@ -64,6 +65,19 @@ public class UserServiceImp implements UserService {
     public List<TblUser> getAllUsers() {
         TblUserExample tblUserExample = new TblUserExample();
         return tblUserMapper.selectByExample(tblUserExample);
+    }
+
+    @Override
+    public UserBasicDTO getUserBasicInfo(String userId) {
+        TblUser user = this.getUserById(userId);
+        UserBasicDTO dto = new UserBasicDTO();
+
+        dto.setAge(user.getAge());
+        dto.setCity(user.getCity());
+        dto.setUname(user.getUname());
+        dto.setUuid(user.getUuid());
+
+        return dto;
     }
 
     @Override

@@ -3,9 +3,9 @@ package com.inori.cloud.providerauth.pojo;
 public class TblUser {
     private String uuid;
 
-    private String uname;
-
     private Integer age;
+
+    private String uname;
 
     private String upass;
 
@@ -19,20 +19,20 @@ public class TblUser {
         this.uuid = uuid == null ? null : uuid.trim();
     }
 
-    public String getUname() {
-        return uname;
-    }
-
-    public void setUname(String uname) {
-        this.uname = uname == null ? null : uname.trim();
-    }
-
     public Integer getAge() {
         return age;
     }
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    public String getUname() {
+        return uname;
+    }
+
+    public void setUname(String uname) {
+        this.uname = uname == null ? null : uname.trim();
     }
 
     public String getUpass() {
@@ -43,12 +43,11 @@ public class TblUser {
         this.upass = upass == null ? null : upass.trim();
     }
 
-
     public String getCity() {
         return city;
     }
 
     public void setCity(String city) {
-        this.city = city;
+        this.city = city == null ? null : city.trim();
     }
 }

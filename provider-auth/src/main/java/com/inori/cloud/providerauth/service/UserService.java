@@ -1,5 +1,6 @@
 package com.inori.cloud.providerauth.service;
 
+import com.inori.cloud.providerauth.dto.UserBasicDTO;
 import com.inori.cloud.providerauth.pojo.TblPermission;
 import com.inori.cloud.providerauth.pojo.TblRole;
 import com.inori.cloud.providerauth.pojo.TblUser;
@@ -17,4 +18,5 @@ public interface UserService {
     boolean deleteRelationBetweenRoleAndUser(String roleId, String userId);
     boolean hasRelationBetweenRoleAndUser(String roleId, String userId);
     List<TblUser> getAllUsers();
+    UserBasicDTO getUserBasicInfo(String userId);
 }

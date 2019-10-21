@@ -95,17 +95,4 @@ public class AuthController {
 
         return authService.getUserByToken(token);
     }
-
-    @GetMapping("getUserBasicInfo")
-    public UserBasicDTO getUserBasicInfo(@RequestParam("userId")String userId) {
-        TblUser user = userService.getUserById(userId);
-        UserBasicDTO dto = new UserBasicDTO();
-
-        dto.setAge(user.getAge());
-        dto.setCity(user.getCity());
-        dto.setUname(user.getUname());
-        dto.setUuid(user.getUuid());
-
-        return dto;
-    }
 }
