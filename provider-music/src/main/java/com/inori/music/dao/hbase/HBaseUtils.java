@@ -1,4 +1,5 @@
-package com.inori.music.hdfs;
+package com.inori.music.dao.hbase;
+
 
 import javafx.util.Pair;
 import org.apache.hadoop.conf.Configuration;
@@ -12,7 +13,6 @@ import java.io.IOException;
 import java.util.List;
 
 public class HBaseUtils {
-
     private static Connection connection;
 
     static {

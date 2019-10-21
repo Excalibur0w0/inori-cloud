@@ -20,7 +20,7 @@ public class ConnectHBaseTest {
         String value = "TEST";
         Configuration config = HBaseConfiguration.create();
 
-        config.set("hbase.zookeeper.quorum","master");
+        config.set("hbase.zookeeper.quorum","master,slave1,slave2");
         config.set("hbase.zookeeper.property.clientPort","2181");
 
         System.out.println("开始连接hbase");
@@ -47,6 +47,7 @@ public class ConnectHBaseTest {
 //        Table table = connect.getTable(TableName.valueOf("midas_ctr_test"));
 //        System.out.println("获取表数据成功");
 //        for i :table.getScanner().iterator();
+
         TableName tableName = TableName.valueOf("RRRR");
         String cf = "cf1";
 

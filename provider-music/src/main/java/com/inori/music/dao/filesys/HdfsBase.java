@@ -28,6 +28,7 @@ public class HdfsBase {
             return FileSystem.get(new URI(HDFS_PATH), configuration, HDFS_USER);
         } catch (URISyntaxException e) {
             log.error("创建FileSystem时， URI的参数不正确");
+            return null;
         }
     }
 
