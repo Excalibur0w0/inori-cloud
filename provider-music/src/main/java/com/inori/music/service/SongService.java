@@ -1,6 +1,8 @@
 package com.inori.music.service;
 
 import com.inori.music.pojo.TblSong;
+import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -9,7 +11,7 @@ public interface SongService {
 
     void likeSong(String songId, String userId);
 
-    TblSong searchSong(String keywords);
+    List<TblSong> searchAllSongs(String keywords);
 
     void dislikeSong(String songId, String userId);
 
@@ -22,4 +24,10 @@ public interface SongService {
     Long countSongByUploader(String uploadUserId);
 
     List<TblSong> getAll();
+
+    List<TblSong> getSongsByAuthor(String author);
+
+    boolean uploadSingleSongChunk(String md5, String uploaderId, MultipartFile file, Long curIndex, Long totalChunks);
+
+    Resource getSingleSongByMd5(String md5);
 }

@@ -4,16 +4,17 @@ import com.inori.music.pojo.TblSong;
 import com.inori.music.utils.MyStringUtils;
 import javafx.util.Pair;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.hadoop.hbase.CompareOperator;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class HSongDao {
@@ -48,25 +49,6 @@ public class HSongDao {
         System.out.println("表创建结果:" + table);
     }
 
-
-    public List<Pair<String, String>> filterInvalidPair(List<Pair<String, String>> pairs) {
-        List<Pair<String, String>> newPair = new LinkedList<>();
-
-        for (Pair<String, String> pair :
-                pairs) {
-            String key = pair.getKey();
-            String value = pair.getValue();
-            if (!StringUtils.isEmpty(key) && !StringUtils.isEmpty(value)) {
-                newPair.add(pair);
-            }
-        }
-        return newPair;
-    }
-
-    public byte[] getValue(Result result, String family, String qualifier) {
-        return result.getValue(Bytes.toBytes(family), Bytes.toBytes(qualifier));
-    }
-
     public void insert(TblSong song) {
         if (StringUtils.isEmpty(song.getUuid())) {
             throw new RuntimeException("向Hbase song表插入时，rowKey不能为空!!");
@@ -89,11 +71,160 @@ public class HSongDao {
     }
 
     public TblSong getById(String rowkey) {
-        TblSong tblSong = null;
         Result result = HBaseUtils.getRow(TABLE_NAME, rowkey);
+        TblSong tblSong = parseResultToSong(result);
 
+        return tblSong;
+    }
+
+
+    public List<TblSong> findAllByAuthor(String author) {
+        List<TblSong> songs = null;
+        SingleColumnValueFilter songNameFilter = new SingleColumnValueFilter(
+                BASEINFO.getBytes(),
+                HSong.SONG_AUTHOR.getBytes(),
+                CompareOperator.EQUAL,
+                new SubstringComparator(author)
+        );
+        songNameFilter.setLatestVersionOnly(true);
+        songNameFilter.setFilterIfMissing(true);
+        FilterList filterList = new FilterList();
+        filterList.addFilter(songNameFilter);
+
+        ResultScanner scanner = HBaseUtils.getScanner(TABLE_NAME, filterList);
+
+        if (scanner != null) {
+            songs = new LinkedList<>();
+            List<TblSong> finalSongs = songs;
+
+            scanner.forEach(result -> {
+                TblSong song = parseResultToSong(result);
+                if (song != null) {
+                    finalSongs.add(song);
+                }
+            });
+            scanner.close();
+        }
+        return songs;
+    }
+
+    public List<TblSong> findAllByKeyWords(String keywords) {
+        List<TblSong> songs = null;
+        SubstringComparator subComp = new SubstringComparator(keywords);
+        SingleColumnValueFilter songNameFilter = new SingleColumnValueFilter(
+                BASEINFO.getBytes(),
+                HSong.SONG_NAME.getBytes(),
+                CompareOperator.EQUAL,
+                subComp
+        );
+        SingleColumnValueFilter authorNameFilter = new SingleColumnValueFilter(
+                BASEINFO.getBytes(),
+                HSong.SONG_AUTHOR.getBytes(),
+                CompareOperator.EQUAL,
+                subComp
+        );
+        FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ONE);
+        songNameFilter.setFilterIfMissing(true);
+        songNameFilter.setLatestVersionOnly(true);
+        authorNameFilter.setFilterIfMissing(true);
+        authorNameFilter.setLatestVersionOnly(true);
+        filterList.addFilter(songNameFilter);
+        filterList.addFilter(authorNameFilter);
+
+        ResultScanner scanner = HBaseUtils.getScanner(TABLE_NAME, filterList);
+
+        if (scanner != null) {
+            songs = new LinkedList<>();
+            List<TblSong> finalSongs = songs;
+
+            scanner.forEach(result -> {
+                TblSong song = parseResultToSong(result);
+                if (song != null) {
+                    finalSongs.add(song);
+                }
+            });
+            scanner.close();
+        }
+
+        return songs;
+    }
+
+    public List<TblSong> findAllByUploader(String uploaderId) {
+        List<TblSong> songs = null;
+        SingleColumnValueFilter filter = new SingleColumnValueFilter(
+                BASEINFO.getBytes(),
+                HSong.SONG_UPLOADER.getBytes(),
+                CompareOperator.EQUAL,
+                new BinaryComparator(uploaderId.getBytes())
+//                new SubstringComparator(uploaderId)
+        );
+
+        filter.setFilterIfMissing(true);
+        filter.setLatestVersionOnly(true);
+        FilterList filterList = new FilterList();
+        filterList.addFilter(filter);
+        ResultScanner scanner = HBaseUtils.getScanner(TABLE_NAME, filterList);
+
+        if (scanner != null) {
+            songs = new LinkedList<>();
+            List<TblSong> finalSongs = songs;
+
+            scanner.forEach(result -> {
+                TblSong song = parseResultToSong(result);
+                if (song != null) {
+                    finalSongs.add(song);
+                }
+            });
+            scanner.close();
+        }
+
+        return songs;
+    }
+
+    public List<TblSong> findAll() {
+        ResultScanner scanner = HBaseUtils.getScanner(TABLE_NAME);
+        List<TblSong> songs = null;
+
+        if (scanner != null) {
+            songs = new LinkedList<>();
+            List<TblSong> finalSongs = songs;
+
+            scanner.forEach(result -> {
+                TblSong song = parseResultToSong(result);
+                if (song != null) {
+                    finalSongs.add(song);
+                }
+            });
+            scanner.close();
+        }
+
+        return songs;
+    }
+
+
+    public static List<Pair<String, String>> filterInvalidPair(List<Pair<String, String>> pairs) {
+        List<Pair<String, String>> newPair = new LinkedList<>();
+
+        for (Pair<String, String> pair :
+                pairs) {
+            String key = pair.getKey();
+            String value = pair.getValue();
+            if (!StringUtils.isEmpty(key) && !StringUtils.isEmpty(value)) {
+                newPair.add(pair);
+            }
+        }
+        return newPair;
+    }
+
+    public static byte[] getValue(Result result, String family, String qualifier) {
+        return result.getValue(Bytes.toBytes(family), Bytes.toBytes(qualifier));
+    }
+
+    public static TblSong parseResultToSong(Result result) {
+        TblSong tblSong = null;
         if (result != null) {
             tblSong = new TblSong();
+            String uuid = Bytes.toString(result.getRow());
             String songName = Bytes.toString(getValue(result, BASEINFO, HSong.SONG_NAME));
             String songAlbum = Bytes.toString(getValue(result, BASEINFO, HSong.SONG_ALBUM));
             String songAuthor = Bytes.toString(getValue(result, BASEINFO, HSong.SONG_AUTHOR));
@@ -111,7 +242,7 @@ public class HSongDao {
             } catch (Exception e) {
                 updatedAt = null;
             }
-
+            tblSong.setUuid(uuid);
             tblSong.setSongName(songName);
             tblSong.setSongAlbum(songAlbum);
             tblSong.setSongAuthor(songAuthor);
@@ -119,15 +250,9 @@ public class HSongDao {
             tblSong.setStorePath(storePath);
             tblSong.setCreatedAt(createdAt);
             tblSong.setUpdatedAt(updatedAt);
-
             result = null;
         }
 
         return tblSong;
     }
-
-    public List<TblSong> findAllByUploader(String uploaderId) {
-        return null;
-    }
-
 }

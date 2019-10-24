@@ -2,15 +2,27 @@ package com.inori.music.service.imp;
 
 import com.inori.music.dao.TblLikeSongDao;
 import com.inori.music.dao.TblSheetSongDao;
+import com.inori.music.dao.hbase.HSongChunkDao;
 import com.inori.music.dao.hbase.HSongDao;
+import com.inori.music.pojo.FileChunk;
 import com.inori.music.pojo.TblLikeSong;
 import com.inori.music.pojo.TblSheetSong;
 import com.inori.music.pojo.TblSong;
 import com.inori.music.service.SongService;
+import com.netflix.discovery.converters.Auto;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +31,8 @@ import java.util.UUID;
 public class HSongServiceImp implements SongService {
     @Autowired
     private HSongDao hSongDao;
+    @Autowired
+    private HSongChunkDao hSongChunkDao;
     @Autowired
     private TblLikeSongDao tblLikeSongDao;
     @Autowired
@@ -46,8 +60,8 @@ public class HSongServiceImp implements SongService {
     }
 
     @Override
-    public TblSong searchSong(String keywords) {
-        return null;
+    public List<TblSong> searchAllSongs(String keywords) {
+        return hSongDao.findAllByKeyWords(keywords);
     }
 
     @Override
@@ -101,15 +115,68 @@ public class HSongServiceImp implements SongService {
 
     @Override
     public Long countSongByUploader(String uploadUserId) {
-        TblSong example = new TblSong();
-        example.setSongUploader(uploadUserId);
-
-//        return tblSongDao.count(Example.of(example));
-        return null;
+        return new Long(hSongDao.findAllByUploader(uploadUserId).size());
     }
 
     @Override
     public List<TblSong> getAll() {
-        return null;
+        return hSongDao.findAll();
+    }
+
+    @Override
+    public List<TblSong> getSongsByAuthor(String author) {
+        return hSongDao.findAllByAuthor(author);
+    }
+
+    @Transactional
+    @Override
+    public boolean uploadSingleSongChunk(String md5, String uploaderId, MultipartFile file, Long curIndex, Long totalChunks) {
+
+        try {
+            if (curIndex < totalChunks) {
+                InputStream in = file.getInputStream();
+                // read
+                byte[] buffer = new byte[1024];
+                int len = 0;
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                while((len = in.read(buffer)) != -1) {
+                    bos.write(buffer, 0, len);
+                }
+                bos.close();
+
+                hSongChunkDao.insert(md5, bos.toByteArray(), curIndex, totalChunks);
+                // 说明上传的是最后一个文件块。
+                if (curIndex + 1 == totalChunks) {
+                    Date now = new Date(System.currentTimeMillis());
+                    TblSong song = new TblSong();
+                    song.setStorePath(md5);
+                    song.setUuid(UUID.randomUUID().toString().substring(0, 16));
+                    song.setSongName(file.getOriginalFilename());
+                    song.setSongUploader(uploaderId);
+                    song.setSongAuthor("inori");
+                    song.setSongAlbum("inori");
+                    song.setCreatedAt(now);
+                    song.setUpdatedAt(now);
+                    hSongDao.insert(song);
+
+                    return true;
+                }
+                return true;
+            } else {
+                throw new RuntimeException("文件块序数只能小于文件块总数!");
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Resource getSingleSongByMd5(String md5) {
+        List<FileChunk> chunks = hSongChunkDao.getAllChunksByMd5(md5);
+        byte[] chunk1 = chunks.get(0).getData();
+        Resource resource = new ByteArrayResource(chunk1);
+
+        return resource;
     }
 }

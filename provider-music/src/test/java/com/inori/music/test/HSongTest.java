@@ -7,6 +7,8 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 public class HSongTest {
@@ -17,9 +19,9 @@ public class HSongTest {
         Date now = new Date(System.currentTimeMillis());
 
         TblSong song = new TblSong();
-        song.setSongName("喜欢你");
-        song.setSongAuthor("Beyond");
-        song.setSongUploader("inori");
+        song.setSongName("dragon");
+        song.setSongAuthor("bakabka");
+        song.setSongUploader("aaaaaaaaaaaaaaaaa");
         song.setUuid(UUID.randomUUID().toString().substring(0, 16));
         song.setCreatedAt(now);
         song.setUpdatedAt(now);
@@ -29,11 +31,36 @@ public class HSongTest {
 
     @Test
     public void getAll() {
-        hSongDao.findAllByUploader("inori");
-        ResultScanner scanner = HBaseUtils.getScanner("tbl_song");
+        hSongDao.findAll().forEach(song -> {
+            System.out.println(song.toString());
+        });
+    }
 
-//        scanner.forEach(mem -> {
-//            System.out.println(mem.getRow().toString());
-//        });
+    @Test
+    public void getAllByUploader() {
+        for (TblSong tblSong : this.hSongDao.findAllByUploader("inori")) {
+            System.out.println(tblSong);
+        }
+    }
+
+    @Test
+    public void searchByKeyWords() {
+        String keywords = "dragon";
+        this.hSongDao.findAllByKeyWords(keywords).forEach(song -> {
+            System.out.println(song);
+        });
+    }
+
+    @Test
+    public void testRandom() {
+        List<String> strs = new LinkedList<>();
+
+        for (int i = 0; i < 1000; i++) {
+            strs.add(UUID.randomUUID().toString().substring(0, 16));
+        }
+
+        strs.forEach(mem -> {
+            System.out.println(mem);
+        });
     }
 }

@@ -9,10 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
+import java.util.Enumeration;
 
 public class FsTest {
     private static final String HDFS_PATH = "hdfs://master:9000";
@@ -47,7 +45,7 @@ public class FsTest {
     public void testPort() {
         Socket connect = new Socket();
         try {
-            connect.connect(new InetSocketAddress("localhost", 9000),100);//建立连接
+            connect.connect(new InetSocketAddress("slave2", 16000),100);//建立连接
             boolean res = connect.isConnected();//通过现有方法查看连通状态
             System.out.println(res);//true为连通
         } catch (IOException e) {
@@ -59,6 +57,33 @@ public class FsTest {
                 System.out.println("false");
             }
         }
+    }
+
+    @Test
+    public void getIpByHost() {
+        try {
+            getInetAddress();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static InetAddress getInetAddress() throws SocketException{
+        Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
+        InetAddress ipHost = null;
+        while (allNetInterfaces.hasMoreElements()) {
+            NetworkInterface netInterface = (NetworkInterface) allNetInterfaces.nextElement();
+            Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
+            while (addresses.hasMoreElements()) {
+                ipHost = (InetAddress) addresses.nextElement();
+                if (ipHost != null && ipHost instanceof Inet4Address) {
+                    System.out.println("本机的HOSTIP = " + ipHost.getHostAddress());
+                    System.out.println("本机的HOSTNAME = " + ipHost.getHostName());
+                    return ipHost;
+                }
+            }
+        }
+        return ipHost;
     }
 
 }

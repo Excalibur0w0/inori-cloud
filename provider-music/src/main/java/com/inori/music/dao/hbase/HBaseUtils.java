@@ -107,8 +107,7 @@ public class HBaseUtils {
 
     /**
      * 插入数据
-     *
-     * @param tableName        表名
+     *  @param tableName        表名
      * @param rowKey           唯一标识
      * @param columnFamilyName 列族名
      * @param pairList         列标识和值的集合
@@ -118,6 +117,27 @@ public class HBaseUtils {
             Table table = connection.getTable(TableName.valueOf(tableName));
             Put put = new Put(Bytes.toBytes(rowKey));
             pairList.forEach(pair -> put.addColumn(Bytes.toBytes(columnFamilyName), Bytes.toBytes(pair.getKey()), Bytes.toBytes(pair.getValue())));
+            table.put(put);
+            table.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    /**
+     * 插入数据
+     *
+     * @param tableName        表名
+     * @param rowKey           唯一标识
+     * @param columnFamilyName 列族名
+     * @param pairList         列标识和值的集合
+     */
+    public static boolean putRowBuffer(String tableName, String rowKey, String columnFamilyName, List<Pair<String, byte[]>> pairList) {
+        try {
+            Table table = connection.getTable(TableName.valueOf(tableName));
+            Put put = new Put(Bytes.toBytes(rowKey));
+            pairList.forEach(pair -> put.addColumn(Bytes.toBytes(columnFamilyName), Bytes.toBytes(pair.getKey()), pair.getValue()));
             table.put(put);
             table.close();
         } catch (IOException e) {

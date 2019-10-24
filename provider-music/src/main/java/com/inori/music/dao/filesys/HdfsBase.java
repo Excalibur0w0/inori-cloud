@@ -37,4 +37,8 @@ public class HdfsBase {
         fileSystem.mkdirs(new Path("/hdfs-api/test0"));
     }
 
+
+    public static long upload2HDFSinOffset(String encryptfilename) throws Exception {
+        return 0;
+    }
 }

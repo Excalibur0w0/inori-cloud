@@ -8,8 +8,10 @@ import com.inori.music.pojo.TblSheetSong;
 import com.inori.music.pojo.TblSong;
 import com.inori.music.service.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,7 +47,7 @@ public class SongServiceImp implements SongService {
     }
 
     @Override
-    public TblSong searchSong(String keywords) {
+    public List<TblSong> searchAllSongs(String keywords) {
         return null;
     }
 
@@ -105,6 +107,21 @@ public class SongServiceImp implements SongService {
     @Override
     public List<TblSong> getAll() {
         return tblSongDao.findAll();
+    }
+
+    @Override
+    public List<TblSong> getSongsByAuthor(String author) {
+        return null;
+    }
+
+    @Override
+    public boolean uploadSingleSongChunk(String md5, String uploaderId, MultipartFile file, Long curIndex, Long totalChunks) {
+        return false;
+    }
+
+    @Override
+    public Resource getSingleSongByMd5(String md5) {
+        return null;
     }
 
 }

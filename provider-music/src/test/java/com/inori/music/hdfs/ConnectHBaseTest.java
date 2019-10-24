@@ -53,10 +53,10 @@ public class ConnectHBaseTest {
 
 
         if (!admin.tableExists(tableName)) {
+            System.out.println("表不存在，开始建表");
             admin.createTable(new HTableDescriptor(tableName).addFamily(new HColumnDescriptor(cf)));
         }
         System.out.println("建表数据成功");
-//
 //        Table table = connect.getTable(tableName);
 //        TimeStamp ts = new TimeStamp(new Date());
 //        Date date = ts.getDate();

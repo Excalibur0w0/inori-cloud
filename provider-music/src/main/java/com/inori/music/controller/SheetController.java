@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-@RestController
 @Log4j2
+@RestController
+@RequestMapping("sheet")
 public class SheetController {
     @Autowired
     private SheetService shtService;
