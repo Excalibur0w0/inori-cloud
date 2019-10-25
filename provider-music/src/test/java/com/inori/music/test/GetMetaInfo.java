@@ -1,20 +1,61 @@
 package com.inori.music.test;
 
+import com.inori.music.dao.hbase.HSongChunkDao;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.flac.FlacFileReader;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;
+import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.id3.ID3v23Frame;
-import org.jaudiotagger.audio.AudioFile;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.sql.Time;
 
 public class GetMetaInfo {
+    private HSongChunkDao hSongChunkDao = new HSongChunkDao();
+
+
+    @Test
+    public void getMetaInfoByStream() throws IOException, TagException, ReadOnlyFileException, CannotReadException, InvalidAudioFrameException {
+        String md5 = "53eca629b56d3aa45831eaaed1f3a7f6";
+        InputStream in = hSongChunkDao.getAllChunksMergeInStream(md5);
+        File file = new File("/dev/shm/" + md5 + ".mp3");
+        FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
+        byte[] buffer = new byte[1024];
+        int len = 0;
+
+        while((len = in.read(buffer)) != -1) {
+            fos.write(buffer, 0, len);
+        }
+        fos.flush();
+        fos.close();
+        in.close();
+
+        MP3File mp3File = (MP3File) AudioFileIO.read(file);
+
+        //歌名
+        ID3v23Frame songnameFrame = (ID3v23Frame) mp3File.getID3v2Tag().frameMap.get("TIT2");
+        String songName = songnameFrame.getContent();
+
+        System.out.println(songName);
+
+
+    }
+
+
+    @Test
+    public void checkNewMD5() throws IOException {
+        String md5 = "53eca629b56d3aa45831eaaed1f3a7f6";
+        InputStream in = hSongChunkDao.getAllChunksMergeInStream(md5);
+        String newMd5 = DigestUtils.md5Hex(in);
+
+        System.out.println(newMd5);
+    }
+
     @Test
     public void getSongInfo() throws FileNotFoundException {
         String filePath = "/home/inori0w0/音乐/CloudMusic/凑诗 - 故人叹 (王朝再编曲版).mp3";

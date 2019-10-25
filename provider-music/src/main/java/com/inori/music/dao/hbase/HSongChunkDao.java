@@ -13,10 +13,8 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.SequenceInputStream;
+import java.util.*;
 
 @Component
 public class HSongChunkDao {
@@ -65,6 +63,7 @@ public class HSongChunkDao {
         HBaseUtils.putRowBuffer(TABLE_NAME, marker, DATAINFO, dataPairs);
     }
 
+    // 字典序，不用再排序
     public List<FileChunk> getAllChunksByMd5(String md5) {
         RowFilter rowFilter = new RowFilter(
                 CompareOperator.EQUAL,
@@ -91,6 +90,22 @@ public class HSongChunkDao {
         }
 
         return chunks;
+    }
+    // 字典序必然一样
+    public List<byte[]> getAllChunksBytesByMd5(String md5) {
+        List<FileChunk> chunks = this.getAllChunksByMd5(md5);
+        List<byte[]> list = new ArrayList<>();
+        chunks.forEach(c -> list.add(c.getData()));
+        return list;
+    }
+
+    public InputStream getAllChunksMergeInStream(String md5) {
+        List<FileChunk> chunks = this.getAllChunksByMd5(md5);
+        List<ByteArrayInputStream> list = new ArrayList<>();
+        chunks.forEach(c -> list.add(new ByteArrayInputStream(c.getData())));
+        Enumeration<ByteArrayInputStream> en = Collections.enumeration(list);
+
+        return new SequenceInputStream(en);
     }
 
     public byte[] getChunkByMd5(String md5, Long curIndex, Long totalChunks) {

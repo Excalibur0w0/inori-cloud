@@ -115,7 +115,7 @@ public class SongServiceImp implements SongService {
     }
 
     @Override
-    public boolean uploadSingleSongChunk(String md5, String uploaderId, MultipartFile file, Long curIndex, Long totalChunks) {
+    public boolean uploadSingleSongChunk(String md5, String uploaderId, MultipartFile file, Long curIndex, Long totalChunks, String extension) {
         return false;
     }
 

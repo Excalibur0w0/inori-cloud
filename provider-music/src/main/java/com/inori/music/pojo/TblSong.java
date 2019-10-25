@@ -44,4 +44,14 @@ public class TblSong {
 
     @Column
     private String storePath;
+
+    @Column
+    private Integer duration;
+
+    @Column
+    private String imgPath;
+
+    @Column
+    private String fileType;
+
 }

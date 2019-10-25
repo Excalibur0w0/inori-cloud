@@ -48,15 +48,17 @@ public class SongController {
                                     @RequestParam("md5") String md5,
                                     @RequestParam("chunkIndex") Long chunkIndex,
                                     @RequestParam("chunkTotal") Long chunkTotal,
-                                    @RequestParam("uploader") String uploader) {
+                                    @RequestParam("uploader") String uploader,
+                                    @RequestParam("extenstion") String extenstion) {
 //        System.out.println(file.getOriginalFilename());
 //        System.out.println(file.getSize());
 //        System.out.println(marker);
 //        System.out.println(chunkIndex);
 //        System.out.println(chunkTotal);
+        log.info(chunkIndex + " " + chunkTotal);
 
         if (chunkIndex < chunkTotal) {
-            songService.uploadSingleSongChunk(md5, uploader, file, chunkIndex, chunkTotal);
+            songService.uploadSingleSongChunk(md5, uploader, file, chunkIndex, chunkTotal, extenstion);
             return new UploadProgressDTO(true, chunkIndex, chunkTotal);
         } else {
             return new UploadProgressDTO(false, chunkIndex, chunkTotal);
