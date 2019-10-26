@@ -13,9 +13,13 @@ public interface SongService {
 
     List<TblSong> searchAllSongs(String keywords);
 
+    boolean isDislikeSong(String songId, String userId);
+
     void dislikeSong(String songId, String userId);
 
     List<TblSong> getSongsByShtId(String shtId);
+
+    List<TblSong> getUserFavoriteSongs(String userId);
 
     Long countSongsByShtId(String shtId);
 
@@ -37,4 +41,6 @@ public interface SongService {
     List<Long> checkSongIntegrity(String md5, Long totalChunks);
 
     Resource getSingleSongByMd5(String md5);
+
+    List<TblSong> wrapWithFavorite(List<TblSong> list);
 }

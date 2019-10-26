@@ -1,12 +1,17 @@
 package com.inori.music.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.inori.music.client.UserServiceClient;
 import com.inori.music.pojo.TblSheet;
+import com.inori.music.service.FetchUserService;
 import com.inori.music.service.SheetService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.undo.AbstractUndoableEdit;
 import java.util.List;
 
 @Log4j2
@@ -16,43 +21,33 @@ public class SheetController {
     @Autowired
     private SheetService shtService;
     @Autowired
-    private HttpServletRequest request;
+    private FetchUserService fetchUserService;
 
-
-    @PostMapping(("createEmptySheet"))
-    public TblSheet createEmptySheet(@RequestParam("sheetName") String sheetName,
-                                    @RequestParam("creator") String userId,
-                                    @RequestParam("desc") String desc) {
-        TblSheet sht = new TblSheet();
-        sht.setShtCreator(userId);
-        sht.setShtName(sheetName);
-        sht.setShtDesc(desc);
-        TblSheet result = shtService.createEmptySheet(sht, userId);
-
-        return result;
+    @GetMapping
+    public TblSheet find(@RequestParam("sheetId")String sheetId) {
+        return shtService.findById(sheetId);
     }
 
-    @PostMapping("createSheet")
-    public TblSheet createSheet(@RequestParam("sheetName") String sheetName,
-                               @RequestParam("creator") String userId,
-                               @RequestParam("desc") String desc,
-                               @RequestParam("songList") List<String> songs) {
+    @PostMapping
+    public TblSheet create(@RequestParam("sheetName") String sheetName,
+                                @RequestParam("desc") String desc,
+                                @RequestParam(name = "songList", required = false) List<String> songs,
+                                @RequestHeader("Authorization") String authorization) {
+        String userId = fetchUserService.getUserId(authorization);
         TblSheet sht = new TblSheet();
         sht.setShtCreator(userId);
         sht.setShtName(sheetName);
         sht.setShtDesc(desc);
 
-        return shtService.createSheetBySongsId(sht, songs, userId);
+        if (songs != null) {
+            return shtService.createSheetBySongsId(sht, songs, userId);
+        } else {
+            return shtService.createEmptySheet(sht, userId);
+        }
     }
 
-    @GetMapping("getAllSheet")
-    public List<TblSheet> getAllSheet(@RequestParam("userId") String userId) {
-
-        return shtService.findByCreator(userId);
-    }
-
-    @PostMapping("alterSheet")
-    public TblSheet alterSheet(@RequestParam("sheetId") String sheetId,
+    @PutMapping
+    public TblSheet update(@RequestParam("sheetId") String sheetId,
                                @RequestParam("sheetName") String sheetName,
                                @RequestParam("desc") String desc) {
         TblSheet tblSheet = new TblSheet();
@@ -62,9 +57,10 @@ public class SheetController {
         return shtService.updateSheet(sheetId, tblSheet);
     }
 
-    @GetMapping("getSheetInfo")
-    public TblSheet getSheetInfo(@RequestParam("sheetId")String sheetId) {
-        return shtService.findById(sheetId);
+    @DeleteMapping
+    public boolean delete(@RequestParam("sheetId")String sheetId) {
+        shtService.deleteSheet(sheetId);
+        return true;
     }
 
 }

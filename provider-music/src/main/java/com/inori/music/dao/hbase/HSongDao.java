@@ -22,6 +22,7 @@ public class HSongDao {
     private static final String BASEINFO = "base_info";
     private static final String STOREINFO = "store_info";
 
+
     public static class HSong {
         static final String SONG_NAME = "SONG_NAME";
         static final String CREATED_AT = "CREATED_AT";

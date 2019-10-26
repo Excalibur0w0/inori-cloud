@@ -25,10 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class HSongServiceImp implements SongService {
@@ -68,6 +65,16 @@ public class HSongServiceImp implements SongService {
     }
 
     @Override
+    public boolean isDislikeSong(String songId, String userId) {
+        TblLikeSong tblLikeSong = new TblLikeSong();
+        tblLikeSong.setSongId(songId);
+        tblLikeSong.setUserId(userId);
+        TblLikeSong result = tblLikeSongDao.findOne(Example.of(tblLikeSong)).orElse(null);
+
+        return result == null;
+    }
+
+    @Override
     public void dislikeSong(String songId, String userId) {
         TblLikeSong tblLikeSong = new TblLikeSong();
         tblLikeSong.setUserId(userId);
@@ -98,6 +105,20 @@ public class HSongServiceImp implements SongService {
         });
 
         return resultSet;
+    }
+
+    @Override
+    public List<TblSong> getUserFavoriteSongs(String userId) {
+        List<TblSong> results = new ArrayList<>();
+        TblLikeSong tblLikeSong = new TblLikeSong();
+        tblLikeSong.setUserId(userId);
+
+        List<TblLikeSong> likeSongs = tblLikeSongDao.findAll(Example.of(tblLikeSong));
+        likeSongs.forEach(ls -> {
+            results.add(hSongDao.getById(ls.getSongId()));
+        });
+
+        return results;
     }
 
     @Override
@@ -204,5 +225,20 @@ public class HSongServiceImp implements SongService {
         Resource resource = new InputStreamResource(in);
 
         return resource;
+    }
+
+    @Override
+    public List<TblSong> wrapWithFavorite(List<TblSong> list, String userId) {
+        list.forEach(item -> {
+            TblLikeSong tblLikeSong = new TblLikeSong();
+            tblLikeSong.setUserId(userId);
+            tblLikeSong = tblLikeSongDao.findOne(Example.of(tblLikeSong)).orElse(null);
+
+            if (tblLikeSong != null) {
+
+            }
+
+
+        });
     }
 }
