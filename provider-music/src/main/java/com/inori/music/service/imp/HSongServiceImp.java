@@ -134,11 +134,9 @@ public class HSongServiceImp implements SongService {
     @Transactional
     @Override
     public boolean uploadSingleSongChunk(String md5,
-                                         String uploaderId,
                                          MultipartFile file,
                                          Long curIndex,
-                                         Long totalChunks,
-                                         String extension) {
+                                         Long totalChunks) {
 
         try {
             if (curIndex < totalChunks) {
@@ -153,34 +151,6 @@ public class HSongServiceImp implements SongService {
                 bos.close();
 
                 hSongChunkDao.insert(md5, bos.toByteArray(), curIndex, totalChunks);
-                // 说明上传的是最后一个文件块。
-                if (curIndex + 1 == totalChunks) {
-                    // 将文件所有分片查询出来
-
-                    Date now = new Date(System.currentTimeMillis());
-                    TblSong song = new TblSong();
-                    song.setStorePath(md5);
-                    song.setFileType(extension);
-                    song.setUuid(md5);
-                    song.setSongName(file.getOriginalFilename());
-                    song.setSongUploader(uploaderId);
-                    song.setSongAuthor("default");
-                    song.setSongAlbum("default");
-                    song.setCreatedAt(now);
-                    song.setUpdatedAt(now);
-
-                    InputStream mergeIn = hSongChunkDao.getAllChunksMergeInStream(md5);
-                    MusicHelper musicHelper = new MusicHelper(md5, extension);
-                    // 写入缓存磁盘
-                    musicHelper.write(mergeIn);
-                    // 设置MetaInfo
-                    musicHelper.setMP3MetaInfo(song);
-//                    byte[] bytes = musicHelper.getMP3Image();
-
-                    hSongDao.insert(song);
-
-                    return true;
-                }
                 return true;
             } else {
                 throw new RuntimeException("文件块序数只能小于文件块总数!");
@@ -189,6 +159,43 @@ public class HSongServiceImp implements SongService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean afterCompletedUpload(String md5, String extension, String uploaderId) {
+        try {
+            // 将文件所有分片查询出来
+            Date now = new Date(System.currentTimeMillis());
+            TblSong song = new TblSong();
+            song.setStorePath(md5);
+            song.setFileType(extension);
+            song.setUuid(md5);
+            song.setSongName("default");
+            song.setSongUploader(uploaderId);
+            song.setSongAuthor("default");
+            song.setSongAlbum("default");
+            song.setCreatedAt(now);
+            song.setUpdatedAt(now);
+
+            InputStream mergeIn = hSongChunkDao.getAllChunksMergeInStream(md5);
+            MusicHelper musicHelper = new MusicHelper(md5, extension);
+            // 写入缓存磁盘
+            musicHelper.write(mergeIn);
+            // 设置MetaInfo
+            musicHelper.setMP3MetaInfo(song);
+//                    byte[] bytes = musicHelper.getMP3Image();
+
+            hSongDao.insert(song);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public List<Long> checkSongIntegrity(String md5, Long totalChunks) {
+        return hSongChunkDao.checkAbsentChunk(md5, totalChunks);
     }
 
     @Override

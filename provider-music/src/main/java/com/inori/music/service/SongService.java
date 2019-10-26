@@ -27,7 +27,14 @@ public interface SongService {
 
     List<TblSong> getSongsByAuthor(String author);
 
-    boolean uploadSingleSongChunk(String md5, String uploaderId, MultipartFile file, Long curIndex, Long totalChunks, String extension);
+    boolean uploadSingleSongChunk(String md5,
+                                  MultipartFile file,
+                                  Long curIndex,
+                                  Long totalChunks);
+
+    boolean afterCompletedUpload(String md5, String extension, String uploaderId);
+
+    List<Long> checkSongIntegrity(String md5, Long totalChunks);
 
     Resource getSingleSongByMd5(String md5);
 }

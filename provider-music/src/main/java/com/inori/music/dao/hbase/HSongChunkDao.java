@@ -66,7 +66,7 @@ public class HSongChunkDao {
     }
 
 
-    public List<Integer> checkAbsentChunk(String md5, Integer totalChunks) {
+    public List<Long> checkAbsentChunk(String md5, Long totalChunks) {
         RowFilter rowFilter = new RowFilter(
                 CompareOperator.EQUAL,
                 new SubstringComparator(md5)
@@ -76,19 +76,19 @@ public class HSongChunkDao {
         filterList.addFilter(rowFilter);
 
         ResultScanner scanner = HBaseUtils.getScanner(TABLE_NAME, filterList);
-        List<Integer> chunkNums = null;
-        List<Integer> badNums = null;
+        List<Long> chunkNums = null;
+        List<Long> badNums = null;
 
         if (scanner != null) {
             chunkNums = new ArrayList<>();
-            List<Integer> finalChunkNums = chunkNums;
+            List<Long> finalChunkNums = chunkNums;
 
             scanner.forEach(result -> {
                 String rowkey = Bytes.toString(result.getRow());
                 Pattern pattern = Pattern.compile("\\-(\\d+)\\-");
                 Matcher m = pattern.matcher(rowkey);
                 if (m.find()) {
-                    finalChunkNums.add(Integer.parseInt(m.group(1)));
+                    finalChunkNums.add(Long.parseLong(m.group(1)));
                 } else {
                     throw new RuntimeException("无法从rowkey中获取文件的块序号! rowkey: " + rowkey);
                 }
@@ -100,10 +100,11 @@ public class HSongChunkDao {
                     // 返回空表示没有缺失的块
                     return null;
                 } else {
-                    List<Integer> absentChunk = new ArrayList();
+                    List<Long> absentChunk = new ArrayList();
                     for (int i = 0, j = 0; i < totalChunks && j < size; i++, j++) {
-                        if (i != j) {
-                            absentChunk.add(i);
+                        System.out.println(i + " : " + chunkNums.get(j));
+                        if (i != chunkNums.get(j)) {
+                            absentChunk.add((long)i);
                             i++;
                         }
                     }

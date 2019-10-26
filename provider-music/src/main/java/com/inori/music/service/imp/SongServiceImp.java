@@ -18,21 +18,17 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Service
-public class SongServiceImp implements SongService {
-    @Autowired
+//@Service
+@Deprecated
+public class SongServiceImp {
     private TblSongDao tblSongDao;
-    @Autowired
     private TblLikeSongDao tblLikeSongDao;
-    @Autowired
     private TblSheetSongDao tblSheetSongDao;
 
-    @Override
     public TblSong getById(String songId) {
         return tblSongDao.findById(songId).orElse(null);
     }
 
-    @Override
     public void likeSong(String songId, String userId) {
         tblSongDao.findById(songId).ifPresent(song -> {
             TblLikeSong var = new TblLikeSong();
@@ -46,12 +42,10 @@ public class SongServiceImp implements SongService {
         });
     }
 
-    @Override
     public List<TblSong> searchAllSongs(String keywords) {
         return null;
     }
 
-    @Override
     public void dislikeSong(String songId, String userId) {
         TblLikeSong tblLikeSong = new TblLikeSong();
         tblLikeSong.setUserId(userId);
@@ -66,7 +60,6 @@ public class SongServiceImp implements SongService {
         }
     }
 
-    @Override
     public List<TblSong> getSongsByShtId(String shtId) {
         TblSheetSong example = new TblSheetSong();
         example.setShtId(shtId);
@@ -80,7 +73,6 @@ public class SongServiceImp implements SongService {
         return resultSet;
     }
 
-    @Override
     public Long countSongsByShtId(String shtId) {
         TblSheetSong example = new TblSheetSong();
         example.setShtId(shtId);
@@ -88,7 +80,6 @@ public class SongServiceImp implements SongService {
         return tblSheetSongDao.count(Example.of(example));
     }
 
-    @Override
     public List<TblSong> getSongsByUploader(String uploadUserId) {
         TblSong example = new TblSong();
         example.setSongUploader(uploadUserId);
@@ -96,7 +87,6 @@ public class SongServiceImp implements SongService {
         return tblSongDao.findAll(Example.of(example));
     }
 
-    @Override
     public Long countSongByUploader(String uploadUserId) {
         TblSong example = new TblSong();
         example.setSongUploader(uploadUserId);
@@ -104,22 +94,22 @@ public class SongServiceImp implements SongService {
         return tblSongDao.count(Example.of(example));
     }
 
-    @Override
     public List<TblSong> getAll() {
         return tblSongDao.findAll();
     }
 
-    @Override
     public List<TblSong> getSongsByAuthor(String author) {
         return null;
     }
 
-    @Override
     public boolean uploadSingleSongChunk(String md5, String uploaderId, MultipartFile file, Long curIndex, Long totalChunks, String extension) {
         return false;
     }
 
-    @Override
+    public List<Integer> checkSongIntegrity(String md5, Integer totalChunks) {
+        return null;
+    }
+
     public Resource getSingleSongByMd5(String md5) {
         return null;
     }

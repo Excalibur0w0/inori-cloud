@@ -5,12 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 @Data
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class UploadProgressDTO {
     private boolean canContinue;
-    private long chunkIndex;
-    private long chunkTotal;
+    private List<Long> badChunks;
 }

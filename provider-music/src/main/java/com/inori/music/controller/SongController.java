@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
@@ -49,21 +50,35 @@ public class SongController {
                                     @RequestParam("chunkIndex") Long chunkIndex,
                                     @RequestParam("chunkTotal") Long chunkTotal,
                                     @RequestParam("uploader") String uploader,
-                                    @RequestParam("extenstion") String extenstion) {
-//        System.out.println(file.getOriginalFilename());
-//        System.out.println(file.getSize());
-//        System.out.println(marker);
-//        System.out.println(chunkIndex);
-//        System.out.println(chunkTotal);
+                                    @RequestParam("extenstion") String extenstion,
+                                    @RequestParam("checkRightNow") Boolean checkRightNow) {
         log.info(chunkIndex + " " + chunkTotal);
 
+
         if (chunkIndex < chunkTotal) {
-            songService.uploadSingleSongChunk(md5, uploader, file, chunkIndex, chunkTotal, extenstion);
-            return new UploadProgressDTO(true, chunkIndex, chunkTotal);
+            songService.uploadSingleSongChunk(md5, file, chunkIndex, chunkTotal);
+
+            if (chunkIndex + 1 == chunkTotal || checkRightNow) {
+                return checkAndRegist(md5, chunkTotal, extenstion, uploader);
+            } else {
+                return new UploadProgressDTO(true, null);
+            }
         } else {
-            return new UploadProgressDTO(false, chunkIndex, chunkTotal);
+            return new UploadProgressDTO(false, null);
         }
     }
+
+    public UploadProgressDTO checkAndRegist(String md5, Long chunkTotal, String extenstion, String uploader) {
+        List<Long> badChunks = songService.checkSongIntegrity(md5, chunkTotal);
+
+        if (badChunks != null) {
+            return new UploadProgressDTO(false, badChunks);
+        }
+        // 不存在坏块
+        songService.afterCompletedUpload(md5, extenstion, uploader);
+        return new UploadProgressDTO(false, null);
+    }
+
 
     @GetMapping("download")
     public ResponseEntity<Resource> download(@RequestParam("md5") String md5) {

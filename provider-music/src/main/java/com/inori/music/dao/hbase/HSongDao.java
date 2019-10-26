@@ -30,6 +30,9 @@ public class HSongDao {
         static final String SONG_ALBUM = "SONG_ALBUM";
         static final String SONG_UPLOADER = "SONG_UPLOADER";
         static final String STORE_PATH = "STORE_PATH";
+        static final String FILE_TYPE = "FILE_TYPE";
+        static final String DURATION = "DURATION";
+        static final String IMG_PATH = "IMG_PATH";
     }
 
     public HSongDao () {
@@ -58,7 +61,10 @@ public class HSongDao {
                 new Pair<>(HSong.SONG_NAME, song.getSongName()),
                 new Pair<>(HSong.SONG_ALBUM, song.getSongAlbum()),
                 new Pair<>(HSong.SONG_AUTHOR, song.getSongAuthor()),
-                new Pair<>(HSong.SONG_UPLOADER, song.getSongUploader())
+                new Pair<>(HSong.SONG_UPLOADER, song.getSongUploader()),
+                new Pair<>(HSong.FILE_TYPE, song.getFileType()),
+                new Pair<>(HSong.IMG_PATH, song.getImgPath()),
+                new Pair<>(HSong.DURATION, song.getDuration().toString())
         ));
         List<Pair<String, String>> storePairs = this.filterInvalidPair(Arrays.asList(
                 new Pair<>(HSong.CREATED_AT, Long.toString(song.getCreatedAt().getTime())),
@@ -230,8 +236,16 @@ public class HSongDao {
             String songAuthor = Bytes.toString(getValue(result, BASEINFO, HSong.SONG_AUTHOR));
             String songUploader = Bytes.toString(getValue(result, BASEINFO, HSong.SONG_UPLOADER));
             String storePath = Bytes.toString(getValue(result, STOREINFO, HSong.STORE_PATH));
+            String fileType = Bytes.toString(getValue(result, BASEINFO, HSong.FILE_TYPE));
+            String imgPath = Bytes.toString(getValue(result, BASEINFO, HSong.IMG_PATH));
+            Integer duration;
             Date createdAt, updatedAt;
 
+            try {
+                duration =  Integer.parseInt(Bytes.toString(getValue(result, BASEINFO, HSong.DURATION)));
+            } catch (Exception e) {
+                duration = 0;
+            }
             try {
                 createdAt = new Date(Bytes.toLong(getValue(result, STOREINFO, HSong.CREATED_AT)));
             } catch (Exception e) {
@@ -250,6 +264,9 @@ public class HSongDao {
             tblSong.setStorePath(storePath);
             tblSong.setCreatedAt(createdAt);
             tblSong.setUpdatedAt(updatedAt);
+            tblSong.setDuration(duration);
+            tblSong.setImgPath(imgPath);
+            tblSong.setFileType(fileType);
             result = null;
         }
 
