@@ -3,8 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/api-gateway/api-gateway.iml" filepath="$PROJECT_DIR$/api-gateway/api-gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/provider-comment/comment.iml" filepath="$PROJECT_DIR$/provider-comment/comment.iml" />
       <module fileurl="file://$PROJECT_DIR$/consumer-auth/consumer-auth.iml" filepath="$PROJECT_DIR$/consumer-auth/consumer-auth.iml" />
       <module fileurl="file://$PROJECT_DIR$/demo/demo.iml" filepath="$PROJECT_DIR$/demo/demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/provider-music/music.iml" filepath="$PROJECT_DIR$/provider-music/music.iml" />
       <module fileurl="file://$PROJECT_DIR$/oauth2/oauth2.iml" filepath="$PROJECT_DIR$/oauth2/oauth2.iml" />
       <module fileurl="file://$PROJECT_DIR$/provider-auth/provider-auth.iml" filepath="$PROJECT_DIR$/provider-auth/provider-auth.iml" />
       <module fileurl="file://$PROJECT_DIR$/provider-comment/provider-comment.iml" filepath="$PROJECT_DIR$/provider-comment/provider-comment.iml" />

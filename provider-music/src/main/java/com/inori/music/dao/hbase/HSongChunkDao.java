@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class HSongChunkDao {
@@ -61,6 +63,58 @@ public class HSongChunkDao {
         );
 
         HBaseUtils.putRowBuffer(TABLE_NAME, marker, DATAINFO, dataPairs);
+    }
+
+
+    public List<Integer> checkAbsentChunk(String md5, Integer totalChunks) {
+        RowFilter rowFilter = new RowFilter(
+                CompareOperator.EQUAL,
+                new SubstringComparator(md5)
+        );
+
+        FilterList filterList = new FilterList();
+        filterList.addFilter(rowFilter);
+
+        ResultScanner scanner = HBaseUtils.getScanner(TABLE_NAME, filterList);
+        List<Integer> chunkNums = null;
+        List<Integer> badNums = null;
+
+        if (scanner != null) {
+            chunkNums = new ArrayList<>();
+            List<Integer> finalChunkNums = chunkNums;
+
+            scanner.forEach(result -> {
+                String rowkey = Bytes.toString(result.getRow());
+                Pattern pattern = Pattern.compile("\\-(\\d+)\\-");
+                Matcher m = pattern.matcher(rowkey);
+                if (m.find()) {
+                    finalChunkNums.add(Integer.parseInt(m.group(1)));
+                } else {
+                    throw new RuntimeException("无法从rowkey中获取文件的块序号! rowkey: " + rowkey);
+                }
+            });
+            scanner.close();
+            if (chunkNums != null) {
+                int size = chunkNums.size();
+                if (size == totalChunks) {
+                    // 返回空表示没有缺失的块
+                    return null;
+                } else {
+                    List<Integer> absentChunk = new ArrayList();
+                    for (int i = 0, j = 0; i < totalChunks && j < size; i++, j++) {
+                        if (i != j) {
+                            absentChunk.add(i);
+                            i++;
+                        }
+                    }
+                    return absentChunk;
+                }
+            } else {
+                throw new RuntimeException("没有找到md5为" + md5 + "的文件片");
+            }
+        } else {
+            throw new RuntimeException("获取Scanner错误");
+        }
     }
 
     // 字典序，不用再排序
