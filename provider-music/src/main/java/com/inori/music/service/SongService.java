@@ -1,5 +1,6 @@
 package com.inori.music.service;
 
+import com.inori.music.dto.SongDTO;
 import com.inori.music.pojo.TblSong;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,13 +12,19 @@ public interface SongService {
 
     void likeSong(String songId, String userId);
 
+    void dislikeSong(String songId, String userId);
+
+    void collectSong(String sheetId, String songId, String userId);
+
+    void cancelCollect(String sheetId, String songId, String userId);
+
     List<TblSong> searchAllSongs(String keywords);
 
     boolean isDislikeSong(String songId, String userId);
 
-    void dislikeSong(String songId, String userId);
-
     List<TblSong> getSongsByShtId(String shtId);
+
+    List<SongDTO> getSongsByUserLike(String userId);
 
     List<TblSong> getUserFavoriteSongs(String userId);
 
@@ -39,8 +46,8 @@ public interface SongService {
     boolean afterCompletedUpload(String md5, String extension, String uploaderId);
 
     List<Long> checkSongIntegrity(String md5, Long totalChunks);
-
+    
     Resource getSingleSongByMd5(String md5);
 
-    List<TblSong> wrapWithFavorite(List<TblSong> list);
+    public List<SongDTO> wrapWithFavorite(List<TblSong> list, String userId);
 }

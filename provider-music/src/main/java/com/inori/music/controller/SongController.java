@@ -14,17 +14,41 @@ public class SongController {
     private FetchUserService fetchUserService;
 
     @PostMapping("like")
-    public void like(@RequestHeader("Authorization") String authorization,
+    public Boolean like(@RequestHeader("Authorization") String authorization,
                      @RequestParam("songId") String songId) {
         String userId = fetchUserService.getUserId(authorization);
         songService.likeSong(songId, userId);
+        return true;
     }
 
     @DeleteMapping("like")
-    public void dislike(@RequestHeader("Authorization") String authorization,
+    public Boolean dislike(@RequestHeader("Authorization") String authorization,
                         @RequestParam("songId") String songId) {
         String userId = fetchUserService.getUserId(authorization);
         songService.dislikeSong(songId, userId);
+        return true;
+    }
+
+    @PostMapping("collect")
+    public Boolean collect(@RequestHeader("Authorization") String authorization,
+                           @RequestParam("sheetId") String sheetId,
+                           @RequestParam("songId") String songId) {
+        String userId = fetchUserService.getUserId(authorization);
+
+        songService.collectSong(sheetId, songId, userId);
+
+        return true;
+    }
+
+    @DeleteMapping("collect")
+    public Boolean cancelCollect(@RequestParam("Authorization") String authorization,
+                                 @RequestParam("sheetId") String sheetId,
+                                 @RequestParam("songId") String songId) {
+        String userId = fetchUserService.getUserId(authorization);
+
+        songService.cancelCollect(sheetId, songId, userId);
+
+        return true;
     }
 
 

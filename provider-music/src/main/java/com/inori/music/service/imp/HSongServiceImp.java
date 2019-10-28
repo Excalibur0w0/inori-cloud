@@ -1,17 +1,17 @@
 package com.inori.music.service.imp;
 
 import com.inori.music.dao.TblLikeSongDao;
+import com.inori.music.dao.TblSheetDao;
 import com.inori.music.dao.TblSheetSongDao;
 import com.inori.music.dao.hbase.HSongChunkDao;
 import com.inori.music.dao.hbase.HSongDao;
-import com.inori.music.pojo.FileChunk;
-import com.inori.music.pojo.TblLikeSong;
-import com.inori.music.pojo.TblSheetSong;
-import com.inori.music.pojo.TblSong;
+import com.inori.music.dto.SongDTO;
+import com.inori.music.pojo.*;
 import com.inori.music.service.SongService;
 import com.inori.music.utils.MusicHelper;
 import com.netflix.discovery.converters.Auto;
 import jdk.internal.util.xml.impl.Input;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+@Log4j2
 @Service
 public class HSongServiceImp implements SongService {
     @Autowired
@@ -37,6 +38,8 @@ public class HSongServiceImp implements SongService {
     private TblLikeSongDao tblLikeSongDao;
     @Autowired
     private TblSheetSongDao tblSheetSongDao;
+    @Autowired
+    private TblSheetDao tblSheetDao;
 
     @Override
     public TblSong getById(String songId) {
@@ -90,6 +93,46 @@ public class HSongServiceImp implements SongService {
     }
 
     @Override
+    public void collectSong(String sheetId, String songId, String userId) {
+        TblSheet sheet = tblSheetDao.findById(sheetId).orElse(null);
+        if (sheet == null) {
+            throw new RuntimeException("歌单不存在");
+        }
+        if (!sheet.getShtCreator().equals(userId)) {
+            throw new RuntimeException("不是该歌单的创建者");
+        }
+
+        TblSheetSong ss = new TblSheetSong();
+        ss.setShtId(sheetId);
+        ss.setSongId(songId);
+        if (tblSheetSongDao.findOne(Example.of(ss)).orElse(null) != null) {
+            throw new RuntimeException("已经收藏过该歌单");
+        };
+        ss.setUuid(UUID.randomUUID().toString());
+
+        tblSheetSongDao.save(ss);
+    }
+
+    @Override
+    public void cancelCollect(String sheetId, String songId, String userId) {
+        TblSheet sheet = tblSheetDao.findById(sheetId).orElse(null);
+        if (sheet == null) {
+            throw new RuntimeException("歌单不存在");
+        }
+        if (!sheet.getShtCreator().equals(userId)) {
+            throw new RuntimeException("不是该歌单的创建者");
+        }
+
+        TblSheetSong ss = new TblSheetSong();
+        ss.setSongId(songId);
+        ss.setShtId(sheetId);
+        if (tblSheetSongDao.findOne(Example.of(ss)).orElse(null)  == null) {
+            throw new RuntimeException("没有收藏该歌单");
+        }
+        tblSheetSongDao.delete(ss);
+    }
+
+    @Override
     public List<TblSong> getSongsByShtId(String shtId) {
         TblSheetSong example = new TblSheetSong();
         example.setShtId(shtId);
@@ -105,6 +148,25 @@ public class HSongServiceImp implements SongService {
         });
 
         return resultSet;
+    }
+
+    @Override
+    public List<SongDTO> getSongsByUserLike(String userId) {
+        TblLikeSong example = new TblLikeSong();
+        example.setUserId(userId);
+        List<SongDTO> result = new ArrayList<>();
+
+        tblLikeSongDao.findAll(Example.of(example)).forEach(ls -> {
+            TblSong s = hSongDao.getById(ls.getSongId());
+            if (s != null) {
+                SongDTO dto = new SongDTO();
+                dto.setSong(s);
+                dto.setIsFavorite(true);
+                result.add(dto);
+            }
+        });
+
+        return result;
     }
 
     @Override
@@ -228,17 +290,21 @@ public class HSongServiceImp implements SongService {
     }
 
     @Override
-    public List<TblSong> wrapWithFavorite(List<TblSong> list, String userId) {
+    public List<SongDTO> wrapWithFavorite(List<TblSong> list, String userId) {
+        List<SongDTO> results = new ArrayList<>();
+
         list.forEach(item -> {
             TblLikeSong tblLikeSong = new TblLikeSong();
             tblLikeSong.setUserId(userId);
+            tblLikeSong.setSongId(item.getUuid());
             tblLikeSong = tblLikeSongDao.findOne(Example.of(tblLikeSong)).orElse(null);
+            SongDTO songDTO = new SongDTO();
+            songDTO.setSong(item);
+            songDTO.setIsFavorite(tblLikeSong != null);
 
-            if (tblLikeSong != null) {
-
-            }
-
-
+            results.add(songDTO);
         });
+
+        return results;
     }
 }
