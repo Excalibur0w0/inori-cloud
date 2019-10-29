@@ -33,4 +33,8 @@ public class TblSheet {
 
     @Column
     private String shtDesc;
+
+    // 通常情况下 imgPath是歌单下的一首歌曲封面
+    @Transient //不映射到数据库
+    private String imgPath;
 }

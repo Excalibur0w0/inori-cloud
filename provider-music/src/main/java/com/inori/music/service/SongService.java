@@ -1,6 +1,7 @@
 package com.inori.music.service;
 
 import com.inori.music.dto.SongDTO;
+import com.inori.music.pojo.FileImg;
 import com.inori.music.pojo.TblSong;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +25,7 @@ public interface SongService {
 
     List<TblSong> getSongsByShtId(String shtId);
 
-    List<SongDTO> getSongsByUserLike(String userId);
+    List<TblSong> getSongsByUserLike(String userId);
 
     List<TblSong> getUserFavoriteSongs(String userId);
 
@@ -49,5 +50,7 @@ public interface SongService {
     
     Resource getSingleSongByMd5(String md5);
 
-    public List<SongDTO> wrapWithFavorite(List<TblSong> list, String userId);
+    FileImg getSongImage(String imgPath);
+
+    public List<TblSong> wrapWithFavorite(List<TblSong> list, String userId);
 }

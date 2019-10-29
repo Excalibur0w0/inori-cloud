@@ -3,6 +3,7 @@ package com.inori.music.service.imp;
 import com.inori.music.dao.TblLikeSongDao;
 import com.inori.music.dao.TblSheetDao;
 import com.inori.music.dao.TblSheetSongDao;
+import com.inori.music.dao.hbase.HImageDao;
 import com.inori.music.dao.hbase.HSongChunkDao;
 import com.inori.music.dao.hbase.HSongDao;
 import com.inori.music.dto.SongDTO;
@@ -22,9 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 @Log4j2
@@ -34,6 +33,8 @@ public class HSongServiceImp implements SongService {
     private HSongDao hSongDao;
     @Autowired
     private HSongChunkDao hSongChunkDao;
+    @Autowired
+    private HImageDao hImageDao;
     @Autowired
     private TblLikeSongDao tblLikeSongDao;
     @Autowired
@@ -151,18 +152,16 @@ public class HSongServiceImp implements SongService {
     }
 
     @Override
-    public List<SongDTO> getSongsByUserLike(String userId) {
+    public List<TblSong> getSongsByUserLike(String userId) {
         TblLikeSong example = new TblLikeSong();
         example.setUserId(userId);
-        List<SongDTO> result = new ArrayList<>();
+        List<TblSong> result = new ArrayList<>();
 
         tblLikeSongDao.findAll(Example.of(example)).forEach(ls -> {
             TblSong s = hSongDao.getById(ls.getSongId());
             if (s != null) {
-                SongDTO dto = new SongDTO();
-                dto.setSong(s);
-                dto.setIsFavorite(true);
-                result.add(dto);
+                s.setIsFavorite(true);
+                result.add(s);
             }
         });
 
@@ -244,6 +243,13 @@ public class HSongServiceImp implements SongService {
         }
     }
 
+    /**
+     * 最好使用子线程进行合并
+     * @param md5
+     * @param extension
+     * @param uploaderId
+     * @return
+     */
     @Override
     public boolean afterCompletedUpload(String md5, String extension, String uploaderId) {
         try {
@@ -259,6 +265,7 @@ public class HSongServiceImp implements SongService {
             song.setSongAlbum("default");
             song.setCreatedAt(now);
             song.setUpdatedAt(now);
+            song.setImgPath(md5);
 
             InputStream mergeIn = hSongChunkDao.getAllChunksMergeInStream(md5);
             MusicHelper musicHelper = new MusicHelper(md5, extension);
@@ -266,7 +273,19 @@ public class HSongServiceImp implements SongService {
             musicHelper.write(mergeIn);
             // 设置MetaInfo
             musicHelper.setMP3MetaInfo(song);
-//                    byte[] bytes = musicHelper.getMP3Image();
+            Thread doReadImg = new Thread(() -> {
+                byte[] imageBuffer = musicHelper.getMP3Image();
+                FileImg fileImg = new FileImg();
+                fileImg.setData(imageBuffer);
+                // 使用歌曲的md5作为图片的rowkey
+                fileImg.setFilename(md5);
+                // 暂时都当作png处理
+                fileImg.setFiletype("png");
+
+                hImageDao.insert(fileImg);
+                // 目前解决方案直接把md5当作 音乐文件的rowkey，所以不需要再次写入tbl_song
+            });
+            doReadImg.start();
 
             hSongDao.insert(song);
             return true;
@@ -281,30 +300,58 @@ public class HSongServiceImp implements SongService {
         return hSongChunkDao.checkAbsentChunk(md5, totalChunks);
     }
 
+    /**
+     * 因为chrome需要content-type才能更改currentTime，所以更改此方法
+     * @param md5
+     * @return
+     */
     @Override
     public Resource getSingleSongByMd5(String md5) {
-        InputStream in = hSongChunkDao.getAllChunksMergeInStream(md5);
-        Resource resource = new InputStreamResource(in);
+        ByteArrayOutputStream bos = null;
+        InputStream in = null;
+        try {
+            in = hSongChunkDao.getAllChunksMergeInStream(md5);
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            bos = new ByteArrayOutputStream();
+            while ((len = in.read(buffer)) != -1) {
+                bos.write(buffer, 0, len);
+            }
+            bos.close();
 
-        return resource;
+            return new ByteArrayResource(bos.toByteArray());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (bos != null) {
+                    bos.close();
+                }
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public List<SongDTO> wrapWithFavorite(List<TblSong> list, String userId) {
-        List<SongDTO> results = new ArrayList<>();
+    public FileImg getSongImage(String imgPath) {
+        // 因为直接把imgPath当作 rowkey， 其实imgPath也同时是音乐文件的md5
+        return hImageDao.getById(imgPath);
+    }
 
+    @Override
+    public List<TblSong> wrapWithFavorite(List<TblSong> list, String userId) {
         list.forEach(item -> {
             TblLikeSong tblLikeSong = new TblLikeSong();
             tblLikeSong.setUserId(userId);
             tblLikeSong.setSongId(item.getUuid());
             tblLikeSong = tblLikeSongDao.findOne(Example.of(tblLikeSong)).orElse(null);
-            SongDTO songDTO = new SongDTO();
-            songDTO.setSong(item);
-            songDTO.setIsFavorite(tblLikeSong != null);
-
-            results.add(songDTO);
+            item.setIsFavorite(tblLikeSong != null);
         });
 
-        return results;
+        return list;
     }
 }

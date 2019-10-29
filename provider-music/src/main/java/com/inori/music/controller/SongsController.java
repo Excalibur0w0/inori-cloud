@@ -41,7 +41,7 @@ public class SongsController {
      * @return
      */
     @GetMapping
-    public List<SongDTO> findSongs(@RequestParam(value = "sheetId", required = false)String sheetId,
+    public List<TblSong> findSongs(@RequestParam(value = "sheetId", required = false)String sheetId,
                                    @RequestParam(value = "keywords", required = false)String keywords,
                                    @RequestParam(value = "author", required = false) String author,
                                    @RequestParam(value = "uploaderId", required = false) String uploaderId,
@@ -64,7 +64,7 @@ public class SongsController {
             throw new IllegalArgumentException("传入参数过多");
         }
         List<TblSong> tblSongs = null;
-        List<SongDTO> results = null;
+        List<TblSong> results = null;
 
         if (sheetId != null) {
             tblSongs = songService.getSongsByShtId(sheetId);
@@ -83,9 +83,8 @@ public class SongsController {
             String userId = fetchUserService.getUserId(authorization);
             results = songService.wrapWithFavorite(tblSongs, userId);
         } else {
-            results = new ArrayList<>();
             for (TblSong tblSong : tblSongs) {
-                results.add(new SongDTO(tblSong, false));
+                tblSong.setIsFavorite(false);
             }
         }
         return results;

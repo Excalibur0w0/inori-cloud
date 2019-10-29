@@ -14,10 +14,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class SheetServiceImp implements SheetService {
@@ -32,7 +29,21 @@ public class SheetServiceImp implements SheetService {
 
     @Override
     public TblSheet findById(String shtId) {
-        return tblSheetDao.findById(shtId).orElse(null);
+        TblSheet s = tblSheetDao.findById(shtId).orElse(null);
+        TblSheetSong example = new TblSheetSong();
+        example.setShtId(shtId);
+
+        List<TblSheetSong> sslist = tblSheetSongDao.findAll(Example.of(example));
+
+        if (sslist != null && sslist.size() > 0) {
+            TblSheetSong ss = sslist.get(0);
+            if (ss != null) {
+                s.setImgPath(ss.getSongId());
+            }
+        }
+
+
+        return s;
     }
 
     @Override
@@ -135,6 +146,15 @@ public class SheetServiceImp implements SheetService {
 
     @Override
     public void deleteSheet(String shtId) {
+        TblSheetUser su = new TblSheetUser();
+        TblSheetSong ss = new TblSheetSong();
+
+        su.setShtId(shtId);
+        ss.setShtId(shtId);
+
+        tblSheetUserDao.deleteAll(tblSheetUserDao.findAll(Example.of(su)));
+        tblSheetSongDao.deleteAll(tblSheetSongDao.findAll(Example.of(ss)));
+
         tblSheetDao.deleteById(shtId);
     }
 
@@ -180,5 +200,25 @@ public class SheetServiceImp implements SheetService {
         }
 
         return tblSheetDao.save(target);
+    }
+
+    @Override
+    public List<TblSheet> wrapWithImagePath(List<TblSheet> list) {
+
+        for (TblSheet tblSheet : list) {
+            TblSheetSong example = new TblSheetSong();
+            example.setShtId(tblSheet.getUuid());
+            List<TblSheetSong> sslist = tblSheetSongDao.findAll(Example.of(example));
+
+            if (sslist != null && sslist.size() > 0) {
+                TblSheetSong ss = sslist.get(0);
+                if (ss != null) {
+                    String imgPath = ss.getSongId(); // 获取到的md5即为所需要的imagePath
+                    tblSheet.setImgPath(imgPath);
+                }
+            }
+        }
+
+        return list;
     }
 }

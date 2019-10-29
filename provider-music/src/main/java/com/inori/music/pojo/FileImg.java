@@ -1,17 +1,16 @@
-package com.inori.music.dto;
+package com.inori.music.pojo;
 
-import com.inori.music.pojo.TblSong;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@Deprecated
 @Data
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class SongDTO {
-    private TblSong song;
-    private Boolean isFavorite;
+public class FileImg {
+    private byte[] data;
+    private String filename;
+    private String filetype;
 }
