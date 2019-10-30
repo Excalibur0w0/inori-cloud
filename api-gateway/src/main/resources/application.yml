@@ -21,5 +21,9 @@ zuul:
     provider-music:
       sensitive-headers:
       custom-sensitive-headers: true
+    provider-comment:
+      sensitive-headers:
+      custom-sensitive-headers: true
+
 #  开启全部
 #  sensitive-headers:

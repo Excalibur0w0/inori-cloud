@@ -5,10 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -31,11 +29,23 @@ public class TblComment {
     private String songId;
 
     @Column
-    private Long like;
+    private Long likeCount;
 
     @Column
-    private Long dislike;
+    private Long dislikeCount;
 
     @Column
     private String commentStatus;
+
+    @Column
+    private Date createdAt;
+
+    @Column
+    private Date updatedAt;
+
+    @Transient
+    private String uname;
+
+    @Transient
+    private String avatar;
 }

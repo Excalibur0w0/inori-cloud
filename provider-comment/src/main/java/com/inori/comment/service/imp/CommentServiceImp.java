@@ -1,20 +1,27 @@
 package com.inori.comment.service.imp;
 
+import com.alibaba.fastjson.JSONObject;
 import com.inori.comment.dao.TblCommentDao;
 import com.inori.comment.pojo.TblComment;
 import com.inori.comment.service.CommentService;
+import com.inori.comment.service.FetchUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Service
 public class CommentServiceImp implements CommentService {
     @Autowired
     private TblCommentDao tblCommentDao;
+    @Autowired
+    private FetchUserService fetchUserService;
 
     @Override
     public TblComment getById(String commentId) {
@@ -87,12 +94,55 @@ public class CommentServiceImp implements CommentService {
         return tblCommentDao.findAll(Example.of(cmt));
     }
 
+    /**
+     *
+     * @param cs
+     * @param auth 目标接口需要权限认真
+     * @return
+     */
+    @Override
+    public List<TblComment> wrapWithUserInfo(List<TblComment> cs, String auth) {
+        try {
+            if (cs != null) {
+                Map<TblComment, Future<String>> map = new HashMap<>();
+                for (TblComment c : cs) {
+                    Future<String> futureStr = fetchUserService.getUserInfoAsync(auth, c.getUserId());
+                    if (futureStr != null) {
+                        map.put(c, futureStr);
+                    }
+                }
+                Iterator iter = map.entrySet().iterator();
+
+                while (iter.hasNext()) {
+                    Map.Entry<TblComment, Future<String>> entry = (Map.Entry) iter.next();
+                    TblComment comment = entry.getKey();
+                    Future<String> futureStr = entry.getValue();
+                    String userStr = futureStr.get(1000, TimeUnit.MILLISECONDS);
+                    JSONObject user = JSONObject.parseObject(userStr);
+                    if (user != null && user.get("uname") != null) {
+                        comment.setUname(user.get("uname").toString());
+                    }
+                }
+                iter = null;
+                map = null;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+
+        return cs;
+    }
+
     @Override
     public void likeComment(String commentId, String userId) {
         TblComment cmt = tblCommentDao.findById(commentId).orElse(null);
 
         if (cmt != null) {
-            cmt.setLike(cmt.getLike() + 1);
+            cmt.setLikeCount(cmt.getLikeCount() + 1);
         } else {
             throw new RuntimeException("没有该评论! commentId: " + commentId);
         }
@@ -103,7 +153,7 @@ public class CommentServiceImp implements CommentService {
         TblComment cmt = tblCommentDao.findById(commentId).orElse(null);
 
         if (cmt != null) {
-            cmt.setDislike(cmt.getDislike() + 1);
+            cmt.setDislikeCount(cmt.getDislikeCount() + 1);
         } else {
             throw new RuntimeException("没有该评论! commentId: " + commentId);
         }
@@ -118,6 +168,7 @@ public class CommentServiceImp implements CommentService {
         comment.setSongId(songId);
         comment.setCommentStatus("active");
         comment.setContent(content);
+        comment.setUuid(UUID.randomUUID().toString());
 
         return tblCommentDao.save(comment);
     }
