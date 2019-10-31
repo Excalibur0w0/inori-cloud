@@ -29,7 +29,6 @@ public class ConnectTest {
         user.setUuid("tttt");
         user.setUpass("pwd");
         user.setUname("this is usernaem");
-        user.setAge(12);
         redisTemplate.opsForValue().set("test", user);
         System.out.println(redisTemplate.opsForValue().get("test").getClass());
     }

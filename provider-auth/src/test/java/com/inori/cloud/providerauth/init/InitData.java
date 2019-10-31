@@ -37,7 +37,7 @@ public class InitData {
         TblRole role = new TblRole();
         TblRoleUser tblRoleUser = new TblRoleUser();
 
-        user.setAge(22);
+
         user.setUname("admin");
         user.setUpass("admin");
         user.setUuid(UUID.randomUUID().toString());

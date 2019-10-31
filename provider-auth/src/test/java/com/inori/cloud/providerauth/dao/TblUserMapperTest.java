@@ -22,7 +22,6 @@ public class TblUserMapperTest {
     @Test
     public void insertTest() {
         TblUser user = new TblUser();
-        user.setAge(22);
         user.setUname("inori");
         user.setUuid(UUID.randomUUID().toString());
 

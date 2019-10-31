@@ -72,7 +72,8 @@ public class UserServiceImp implements UserService {
         TblUser user = this.getUserById(userId);
         UserBasicDTO dto = new UserBasicDTO();
 
-        dto.setAge(user.getAge());
+        dto.setBirthday(user.getBirthday());
+        dto.setDesc(user.getDescription());
         dto.setCity(user.getCity());
         dto.setUname(user.getUname());
         dto.setUuid(user.getUuid());

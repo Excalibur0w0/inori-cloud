@@ -26,7 +26,6 @@ public class UserDaoTest {
     @Test
     public void test() {
         TblUser user = new TblUser();
-                user.setAge(23);
         user.setUname("testEncodePass");
         user.setUpass(new BCryptPasswordEncoder().encode("123456"));
         user.setUuid(UUID.randomUUID().toString());

@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.Date;
+
 @Data
 @ToString
 @AllArgsConstructor
@@ -14,4 +16,6 @@ public class UserBasicDTO {
     private String uname;
     private Integer age;
     private String city;
+    private Date birthday;
+    private String desc;
 }

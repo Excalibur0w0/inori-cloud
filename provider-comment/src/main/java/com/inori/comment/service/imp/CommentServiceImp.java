@@ -169,6 +169,8 @@ public class CommentServiceImp implements CommentService {
         comment.setCommentStatus("active");
         comment.setContent(content);
         comment.setUuid(UUID.randomUUID().toString());
+        comment.setCreatedAt(now);
+        comment.setUpdatedAt(now);
 
         return tblCommentDao.save(comment);
     }
