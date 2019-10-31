@@ -5,6 +5,7 @@ import com.inori.cloud.providerauth.pojo.TblPermission;
 import com.inori.cloud.providerauth.pojo.TblRole;
 import com.inori.cloud.providerauth.pojo.TblUser;
 
+import java.io.InputStream;
 import java.util.List;
 
 public interface UserService {
@@ -19,4 +20,5 @@ public interface UserService {
     boolean hasRelationBetweenRoleAndUser(String roleId, String userId);
     List<TblUser> getAllUsers();
     UserBasicDTO getUserBasicInfo(String userId);
+    boolean uploadUserAvatar(String userId, byte[] img);
 }

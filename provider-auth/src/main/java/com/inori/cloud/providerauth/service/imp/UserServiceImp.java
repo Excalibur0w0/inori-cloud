@@ -1,13 +1,16 @@
 package com.inori.cloud.providerauth.service.imp;
 
+import com.inori.cloud.providerauth.dao.hbase.HImageDao;
 import com.inori.cloud.providerauth.dao.mapper.*;
 import com.inori.cloud.providerauth.dto.UserBasicDTO;
 import com.inori.cloud.providerauth.pojo.*;
 import com.inori.cloud.providerauth.service.UserService;
 import com.inori.cloud.providerauth.util.BPwdEncoderUtil;
+import com.netflix.discovery.converters.Auto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +27,8 @@ public class UserServiceImp implements UserService {
     private TblPermissionMapper tblPermissionMapper;
     @Autowired
     private TblPermissionRoleMapper tblPermissionRoleMapper;
+    @Autowired
+    private HImageDao hImageDao;
 
     @Override
     public boolean addUser(TblUser user) {
@@ -79,6 +84,16 @@ public class UserServiceImp implements UserService {
         dto.setUuid(user.getUuid());
 
         return dto;
+    }
+
+    @Override
+    public boolean uploadUserAvatar(String userId, byte[] buff) {
+        FileImg img = new FileImg();
+        img.setData(buff);
+        img.setFilename(userId);
+        img.setFiletype("png");
+        hImageDao.insert(img);
+        return true;
     }
 
     @Override

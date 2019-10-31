@@ -19,6 +19,8 @@ public class TblUser {
 
     private String description;
 
+    private String avatar;
+
     public String getUuid() {
         return uuid;
     }
@@ -81,5 +83,13 @@ public class TblUser {
 
     public void setDescription(String description) {
         this.description = description == null ? null : description.trim();
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar == null ? null : avatar.trim();
     }
 }
