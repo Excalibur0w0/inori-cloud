@@ -8,9 +8,13 @@ import com.inori.cloud.providerauth.service.UserService;
 import com.inori.cloud.providerauth.util.BPwdEncoderUtil;
 import com.netflix.discovery.converters.Auto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -42,9 +46,41 @@ public class UserServiceImp implements UserService {
         return tblUserMapper.deleteByPrimaryKey(userId) > 0;
     }
 
+    @Transactional
     @Override
     public boolean updateUser(String userId, TblUser newUser) {
+        TblUser oldUser = tblUserMapper.selectByPrimaryKey(userId);
+
+        if (StringUtils.isEmpty(newUser.getUname())) {
+            newUser.setUname(oldUser.getUname());
+        }
+        if (StringUtils.isEmpty(newUser.getDescription())) {
+            newUser.setDescription(oldUser.getDescription());
+        }
+        if (newUser.getBirthday() == null) {
+            newUser.setBirthday(oldUser.getBirthday());
+        }
+        if (StringUtils.isEmpty(newUser.getDescription())) {
+            newUser.setGender(oldUser.getGender());
+        }
+        if (StringUtils.isEmpty(newUser.getCity())) {
+            newUser.setCity(oldUser.getCity());
+        }
+        if (StringUtils.isEmpty(newUser.getEmail())) {
+            newUser.setEmail(oldUser.getEmail());
+        }
+        if (StringUtils.isEmpty(newUser.getAvatar())) {
+            newUser.setAvatar(oldUser.getAvatar());
+        }
+        if (StringUtils.isEmpty(newUser.getGender())) {
+            newUser.setGender(oldUser.getGender());
+        }
+        if (StringUtils.isEmpty(newUser.getUpass())) {
+            newUser.setUpass(oldUser.getUpass());
+        }
+
         newUser.setUuid(userId);
+
         return tblUserMapper.updateByPrimaryKey(newUser) > 0;
     }
 
@@ -82,6 +118,11 @@ public class UserServiceImp implements UserService {
         dto.setCity(user.getCity());
         dto.setUname(user.getUname());
         dto.setUuid(user.getUuid());
+        if (StringUtils.isEmpty(user.getAvatar()) || user.getAvatar().trim().length() < 1) {
+            dto.setAvatar(user.getUuid());
+        } else {
+            dto.setAvatar(user.getAvatar());
+        }
 
         return dto;
     }
@@ -94,6 +135,14 @@ public class UserServiceImp implements UserService {
         img.setFiletype("png");
         hImageDao.insert(img);
         return true;
+    }
+
+    @Override
+    public FileImg getAvatarImg(String imgPath) {
+        if (StringUtils.isEmpty(imgPath)) {
+            throw new RuntimeException("imgPath could not be null");
+        }
+        return  hImageDao.getById(imgPath);
     }
 
     @Override
@@ -131,6 +180,7 @@ public class UserServiceImp implements UserService {
         return tblRoleUserMapper.insert(roleUser) > 0;
     }
 
+    @Transactional
     @Override
     public boolean deleteRelationBetweenRoleAndUser(String roleId, String userId) {
         if (this.hasRelationBetweenRoleAndUser(roleId, userId)) {

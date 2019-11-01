@@ -119,8 +119,13 @@ public class CommentServiceImp implements CommentService {
                     Future<String> futureStr = entry.getValue();
                     String userStr = futureStr.get(1000, TimeUnit.MILLISECONDS);
                     JSONObject user = JSONObject.parseObject(userStr);
-                    if (user != null && user.get("uname") != null) {
-                        comment.setUname(user.get("uname").toString());
+                    if (user != null) {
+                        if (user.get("uname") != null) {
+                            comment.setUname(user.get("uname").toString());
+                        }
+                        if (user.get("avatar") != null) {
+                            comment.setAvatar(user.get("avatar").toString());
+                        }
                     }
                 }
                 iter = null;
@@ -135,6 +140,34 @@ public class CommentServiceImp implements CommentService {
         }
 
         return cs;
+    }
+
+    @Override
+    public TblComment wrapWithUserInfo(TblComment comment, String auth) {
+        Future<String> futureStr = fetchUserService.getUserInfoAsync(auth, comment.getUserId());
+
+        try {
+            String userStr = futureStr.get(1000, TimeUnit.MILLISECONDS);
+            JSONObject user = JSONObject.parseObject(userStr);
+            if (user != null) {
+                if (user.get("uname") != null) {
+                    comment.setUname(user.get("uname").toString());
+                }
+                if (user.get("avatar") != null) {
+                    comment.setAvatar(user.get("avatar").toString());
+                }
+            }
+
+            return comment;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @Override

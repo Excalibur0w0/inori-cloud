@@ -18,4 +18,5 @@ public class UserBasicDTO {
     private String city;
     private Date birthday;
     private String desc;
+    private String avatar;
 }

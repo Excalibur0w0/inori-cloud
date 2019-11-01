@@ -13,6 +13,7 @@ public interface CommentService {
     List<TblComment> getAllBySongId(String songId);
     List<TblComment> getAllByUserId(String userId);
     List<TblComment> wrapWithUserInfo(List<TblComment> list, String auth);
+    TblComment wrapWithUserInfo(TblComment comment, String auth);
     void likeComment(String commentId, String userId);
     void dislikeComment(String commentId, String userId);
     TblComment makeComment(String content, String songId, String userId);

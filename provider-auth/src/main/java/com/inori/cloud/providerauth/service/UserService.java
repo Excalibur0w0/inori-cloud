@@ -1,6 +1,7 @@
 package com.inori.cloud.providerauth.service;
 
 import com.inori.cloud.providerauth.dto.UserBasicDTO;
+import com.inori.cloud.providerauth.pojo.FileImg;
 import com.inori.cloud.providerauth.pojo.TblPermission;
 import com.inori.cloud.providerauth.pojo.TblRole;
 import com.inori.cloud.providerauth.pojo.TblUser;
@@ -21,4 +22,6 @@ public interface UserService {
     List<TblUser> getAllUsers();
     UserBasicDTO getUserBasicInfo(String userId);
     boolean uploadUserAvatar(String userId, byte[] img);
+    FileImg getAvatarImg(String imgPath);
+
 }

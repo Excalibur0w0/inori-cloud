@@ -35,6 +35,6 @@ public class CommentController {
         String userId = client.getUserIdByToken(authorization);
         System.out.println(userId);
         System.out.println("userId" + userId);
-        return commentService.makeComment(content, songId, userId);
+        return commentService.wrapWithUserInfo(commentService.makeComment(content, songId, userId), authorization);
     }
 }

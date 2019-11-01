@@ -4,6 +4,7 @@ import com.inori.cloud.providerauth.pojo.FileImg;
 import javafx.util.Pair;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ public class HImageDao {
 
     public void create() {
         // 新建表
-        List<String> columnFamilies = Arrays.asList(DATAINFO);
+        List<String> columnFamilies = Arrays.asList(DATAINFO, METAINFO);
         boolean table = HBaseUtils.createTable(TABLE_NAME, columnFamilies);
         System.out.println("表创建结果:" + table);
     }

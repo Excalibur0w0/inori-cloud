@@ -37,7 +37,7 @@ public class HImageDao {
 
     public void create() {
         // 新建表
-        List<String> columnFamilies = Arrays.asList(DATAINFO);
+        List<String> columnFamilies = Arrays.asList(DATAINFO, METAINFO);
         boolean table = HBaseUtils.createTable(TABLE_NAME, columnFamilies);
         System.out.println("表创建结果:" + table);
     }
