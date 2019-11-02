@@ -17,15 +17,18 @@ public class SheetsController {
     @Autowired
     private SheetService shtService;
 
-    @GetMapping
-    public List<TblSheet> getAllSheetByUserId(@RequestHeader("Authorization") String authorization) {
-        String userId = fetchUserService.getUserId(authorization);
-        System.out.println(userId);
+    @GetMapping("createdBy")
+    public List<TblSheet> getSheetsByCreator(@RequestParam("userId") String userId) {
         return shtService.wrapWithImagePath(shtService.findByCreator(userId));
     }
 
+    @GetMapping("collectedBy")
+    public List<TblSheet> getSheetsByCollector(@RequestParam("userId") String userId) {
+        return shtService.wrapWithImagePath(shtService.findByCollector(userId));
+    }
+
     @GetMapping("all")
-    public List<TblSheet> getAllSheet() {
+    public List<TblSheet> getAllSheets() {
         return shtService.wrapWithImagePath(shtService.findAll());
     }
 }
