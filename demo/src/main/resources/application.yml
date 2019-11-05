@@ -10,12 +10,33 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+#  rabbitmq:
+#    host: localhost
+#    port: 5672
+#    username: passer
+#    password: 123456
+  cloud:
+    stream:
+      bindings:
+        input:
+          destination: sink-channel
+      binders:
+        defaultRabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: passer
+                password: 123456
+
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:3001/eureka
-#    register-with-eureka: false
-#    fetch-registry: false
+    register-with-eureka: false
+    fetch-registry: false
 server:
   port: 8989
