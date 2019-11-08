@@ -11,6 +11,8 @@ import java.util.List;
 public interface SongService {
     TblSong getById(String songId);
 
+    boolean isSongExist(String songId);
+
     void likeSong(String songId, String userId);
 
     void dislikeSong(String songId, String userId);

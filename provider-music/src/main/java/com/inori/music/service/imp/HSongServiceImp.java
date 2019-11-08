@@ -48,6 +48,11 @@ public class HSongServiceImp implements SongService {
     }
 
     @Override
+    public boolean isSongExist(String songId) {
+        return hSongDao.getById(songId) != null;
+    }
+
+    @Override
     public void likeSong(String songId, String userId) {
         TblSong song = hSongDao.getById(songId);
 

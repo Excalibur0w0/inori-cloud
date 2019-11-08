@@ -27,6 +27,11 @@ public class IOController {
     @Autowired
     private SongService songService;
 
+    @GetMapping("isFileExist")
+    public boolean isFileExist(@RequestParam("md5") String md5) {
+        return songService.isSongExist(md5);
+    }
+
     @PostMapping("upload")
     public UploadProgressDTO upload(@RequestParam("file") MultipartFile file,
                                     @RequestParam("md5") String md5,
@@ -63,6 +68,7 @@ public class IOController {
         return new UploadProgressDTO(false, null);
     }
 
+    // io/download?md5=wfaoiaewofjafatae
 
     @GetMapping("download")
     public ResponseEntity<Resource> download(@RequestParam("md5") String md5) {

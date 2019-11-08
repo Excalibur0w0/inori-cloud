@@ -89,6 +89,15 @@ public class AuthService {
         return cacheUserToken.get(token.substring(7));
     }
 
+    public TblUser getUserByTokenAndRefresh(String token) {
+        TblUser usr = this.getUserByToken(token);
+        if (usr != null) {
+            return userService.getUserById(usr.getUuid());
+        } else {
+            return null;
+        }
+    }
+
     public boolean giveRoleToUser(String roleCode, String user_id) {
         TblRole role = roleService.getRoleByRoleCode(roleCode);
 

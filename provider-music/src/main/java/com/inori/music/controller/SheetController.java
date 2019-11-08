@@ -63,4 +63,26 @@ public class SheetController {
         return true;
     }
 
+    @PostMapping("collect")
+    public TblSheet collectSheet(@RequestParam("sheetId") String sheetId,
+                                @RequestHeader("Authorization") String authorization) {
+        String userId = fetchUserService.getUserId(authorization);
+        if (shtService.collectSheet(sheetId, userId) != null) {
+            return shtService.findById(sheetId);
+        } else {
+            return null;
+        }
+    }
+
+    @DeleteMapping("collect")
+    public TblSheet cancelCollectSheet(@RequestParam("sheetId") String sheetId,
+                                      @RequestHeader("Authorization") String authorization) {
+        String userId = fetchUserService.getUserId(authorization);
+
+        if (shtService.cancelCollectSheet(sheetId, userId)) {
+            return shtService.findById(sheetId);
+        } else {
+            return null;
+        }
+    }
 }

@@ -229,7 +229,7 @@ public class HSongDao {
 
     public static TblSong parseResultToSong(Result result) {
         TblSong tblSong = null;
-        if (result != null) {
+        if (result != null && !result.isEmpty()) {
             tblSong = new TblSong();
             String uuid = Bytes.toString(result.getRow());
             String songName = Bytes.toString(getValue(result, BASEINFO, HSong.SONG_NAME));
@@ -269,6 +269,9 @@ public class HSongDao {
             tblSong.setImgPath(imgPath);
             tblSong.setFileType(fileType);
             result = null;
+        }
+        else {
+            return null;
         }
 
         return tblSong;

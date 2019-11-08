@@ -95,4 +95,14 @@ public class AuthController {
 
         return authService.getUserByToken(token);
     }
+
+    @GetMapping("getUserInfoByTokenRefreshCache")
+    public TblUser getUserInfoByTokenRefreshCache(@RequestHeader("Authorization") String token) {
+        if (token == null || token.length() <= 0) {
+            throw new RuntimeException("token cannot be empty");
+        }
+
+        return authService.getUserByTokenAndRefresh(token);
+    }
+
 }

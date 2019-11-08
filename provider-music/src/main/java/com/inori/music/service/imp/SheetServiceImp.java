@@ -177,17 +177,46 @@ public class SheetServiceImp implements SheetService {
      * @param userId
      * @return
      */
+    @Transactional
     @Override
     public TblSheetUser collectSheet(String sheetId, String userId) {
         TblSheetUser tblSheetUser = new TblSheetUser();
 
-        tblSheetUser.setUuid(UUID.randomUUID().toString());
         tblSheetUser.setShtId(sheetId);
         tblSheetUser.setUserId(userId);
+
+        List<TblSheetUser> sus = tblSheetUserDao.findAll(Example.of(tblSheetUser));
+
+        if (sus == null || sus.size() < 1) {
+            tblSheetUser.setUuid(UUID.randomUUID().toString());
+        } else {
+            throw new RuntimeException("该歌单用户已经收藏!");
+        }
 
         return tblSheetUserDao.save(tblSheetUser);
     }
 
+    @Transactional
+    @Override
+    public boolean cancelCollectSheet(String sheetId, String userId) {
+        TblSheetUser example = new TblSheetUser();
+        example.setShtId(sheetId);
+        example.setUserId(userId);
+        List<TblSheetUser> result = tblSheetUserDao.findAll(Example.of(example));
+
+        if (result != null && result.size() > 0) {
+            if (result.size() > 1) {
+                tblSheetUserDao.deleteAll(result);
+            } else {
+                tblSheetUserDao.delete(result.get(0));
+            }
+            return true;
+        } else {
+            throw new RuntimeException("不存在此歌单");
+        }
+    }
+
+    @Transactional
     @Override
     public TblSheet updateSheet(String sheetId, TblSheet newSheet) {
         TblSheet target = tblSheetDao.findById(sheetId).orElse(null);

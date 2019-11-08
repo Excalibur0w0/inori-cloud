@@ -38,6 +38,8 @@ public interface SheetService {
 
     TblSheetUser collectSheet(String sheetId, String userId);
 
+    boolean cancelCollectSheet(String sheetId, String userId);
+
     TblSheet updateSheet(String sheetId, TblSheet newSheet);
 
     List<TblSheet> wrapWithImagePath(List<TblSheet> list);

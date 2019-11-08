@@ -36,6 +36,7 @@ public class UserController {
             user.setDescription(description);
         }
         if (birthday != null && birthday != 0L) {
+            System.out.println(birthday);
             user.setBirthday(new Date(birthday));
         }
         if (!StringUtils.isEmpty(description)) {
