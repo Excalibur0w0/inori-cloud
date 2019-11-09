@@ -81,7 +81,7 @@ public class HSongDao {
         Result result = HBaseUtils.getRow(TABLE_NAME, rowkey);
         TblSong tblSong = parseResultToSong(result);
 
-        return tblSong;
+        return tblSong; 
     }
 
 
