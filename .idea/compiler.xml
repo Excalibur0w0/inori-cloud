@@ -6,27 +6,24 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="demo" />
-        <module name="provider-comment" />
-        <module name="music" />
-        <module name="consumer-auth" />
-        <module name="api-gateway" />
-        <module name="server-center" />
-        <module name="provider-music" />
         <module name="provider-auth" />
-        <module name="comment" />
+        <module name="consumer-auth" />
+        <module name="provider-config" />
+        <module name="api-gateway" />
+        <module name="provider-comment" />
+        <module name="provider-music" />
         <module name="oauth2" />
+        <module name="server-center" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="all" target="1.5" />
       <module name="api-gateway" target="1.8" />
-      <module name="comment" target="1.8" />
       <module name="consumer-auth" target="1.8" />
-      <module name="demo" target="1.8" />
-      <module name="music" target="1.8" />
       <module name="oauth2" target="1.8" />
       <module name="provider-auth" target="1.8" />
       <module name="provider-comment" target="1.8" />
+      <module name="provider-config" target="1.8" />
       <module name="provider-music" target="1.8" />
       <module name="server-center" target="1.8" />
     </bytecodeTargetLevel>
@@ -34,13 +31,11 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
-      <module name="comment" options="-parameters" />
       <module name="consumer-auth" options="-parameters" />
-      <module name="demo" options="-parameters" />
-      <module name="music" options="-parameters" />
       <module name="oauth2" options="-parameters" />
       <module name="provider-auth" options="-parameters" />
       <module name="provider-comment" options="-parameters" />
+      <module name="provider-config" options="-parameters" />
       <module name="provider-music" options="-parameters" />
       <module name="server-center" options="-parameters" />
     </option>

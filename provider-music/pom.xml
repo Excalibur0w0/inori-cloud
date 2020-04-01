@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.inori</groupId>
-    <artifactId>music</artifactId>
+    <artifactId>provider-music</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>music</name>
+    <name>provider-music</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>

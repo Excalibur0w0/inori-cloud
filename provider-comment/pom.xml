@@ -8,10 +8,10 @@
         <version>2.1.9.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.inori</groupId>
-    <artifactId>comment</artifactId>
+    <groupId>com.inori.cloud</groupId>
+    <artifactId>provider-comment</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>comment</name>
+    <name>provider-comment</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
